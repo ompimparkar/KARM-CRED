@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:padding="24dp" android:gravity="center">
+
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="KARM CRED" android:textSize="28sp" android:textStyle="bold" android:textColor="#008080" />
+
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginTop="8dp" android:text="Where Your Daily Hustle Builds Your Credit" android:textSize="14sp" />
+
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="32dp" android:text="To evaluate your TrustScore without salary slips, we analyze on-device SMS for UPI flows and utility bill punctuality. No personal chat data leaves your device."
+        android:textSize="14sp" android:lineSpacingExtra="4dp" />
+
+    <Button android:id="@+id/btnGrantPermissions" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:layout_marginTop="40dp"
+        android:text="Allow &amp; Calculate Score" android:backgroundTint="#008080" />
+</LinearLayout>
