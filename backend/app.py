@@ -7,7 +7,7 @@ from ml.predict import get_prediction_and_explanation
 app = Flask(__name__)
 CORS(app)
 
-DATA_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'karm_cred_synthetic_data.csv')
+DATA_PATH = os.path.join(os.path.dirname(__file__), 'data', 'karm_cred_synthetic_data.csv')
 df = pd.read_csv(DATA_PATH)
 
 # Clean column names (strip spaces and convert to lower case)
