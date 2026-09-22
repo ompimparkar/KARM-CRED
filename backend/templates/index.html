@@ -3,54 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KARM CRED - TrustScore Simulator</title>
-    <link rel="stylesheet" href="../static/css/style.css">
-    <!-- Chart.js Library via CDN -->
+    <title>KARM CRED Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="dashboard-container">
-        <h1>KARM CRED - TrustScore Simulator</h1>
+        <h1>KARM CRED Alternative Scoring Dashboard</h1>
         
+        <!-- Search Box for User ID -->
+        <div class="search-box" style="margin-bottom: 1.5rem; display: flex; gap: 10px;">
+            <input type="text" id="userIdSearch" placeholder="Enter User ID (e.g., GIG0001)" style="padding: 0.75rem; flex: 1; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white;">
+            <button onclick="fetchUserData()" style="padding: 0.75rem 1.5rem; background: #38bdf8; color: #0f172a; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">
+                Analyze User
+            </button>
+        </div>
+
         <div class="content-grid">
-            <!-- Left Side: Sliders Controls -->
+            <!-- Control Panel -->
             <div class="control-panel">
-                <h2>Simulator Controls</h2>
-
+                <h2>User Financial Metrics</h2>
+                
                 <div class="slider-group">
-                    <label for="volatility">Income Volatility: <span id="volatility-val">50</span>%</label>
-                    <input type="range" id="volatility" min="0" max="100" value="50">
+                    <label>Income Volatility: <span id="volatility-val">20%</span></label>
+                    <input type="range" id="volatility" min="0" max="1" step="0.01" value="0.2">
                 </div>
 
                 <div class="slider-group">
-                    <label for="upi">Monthly UPI Transactions: <span id="upi-val">120</span></label>
-                    <input type="range" id="upi" min="0" max="300" value="120">
+                    <label>Monthly UPI Txns: <span id="upi-val">50</span></label>
+                    <input type="range" id="upi" min="0" max="250" step="1" value="50">
                 </div>
 
                 <div class="slider-group">
-                    <label for="utility">Utility On-Time Ratio: <span id="utility-val">85</span>%</label>
-                    <input type="range" id="utility" min="0" max="100" value="85">
+                    <label>Utility Bill Ratio: <span id="utility-val">80%</span></label>
+                    <input type="range" id="utility" min="0" max="1" step="0.01" value="0.8">
                 </div>
 
                 <div class="score-card">
-                    <h3>KARM CRED Score</h3>
-                    <div id="score-display">--</div>
+                    <h3>Predicted Trust Score</h3>
+                    <div id="score-display">750</div>
                 </div>
             </div>
 
-            <!-- Right Side: Dual-View Credit Radar Chart -->
+            <!-- Chart Panel -->
             <div class="chart-panel">
-                <h2>Credit Radar Comparison</h2>
+                <h2>Credit Profile Comparison</h2>
                 <canvas id="creditRadarChart"></canvas>
             </div>
         </div>
     </div>
 
-    <script src="../static/js/dashboard.js"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 </body>
 </html>
-<link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="style.css">
-<script src="dashboard.js"></script>
-<link rel="stylesheet" href="../static/css/style.css">
-<script src="../static/js/dashboard.js"></script>

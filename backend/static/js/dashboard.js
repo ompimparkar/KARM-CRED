@@ -37,61 +37,57 @@ const radarChart = new Chart(ctx, {
             r: {
                 angleLines: { color: '#334155' },
                 grid: { color: '#334155' },
+                pointLabels: { color: '#94a3b8' },
+                ticks: { color: '#94a3b8', backdropColor: 'transparent' },
                 suggestedMin: 0,
-                suggestedMax: 100,
-                ticks: { display: false }
+                suggestedMax: 100
             }
         }
     }
 });
 
-// 3. Function to Fetch Scores from Om's API
-async function fetchScore() {
-    const payload = {
-        volatility: parseFloat(volatilityInput.value),
-        upi: parseInt(upiInput.value),
-        utility: parseFloat(utilityInput.value)
-    };
+// 3. Fetch User Data from Backend by User ID
+async function fetchUserData() {
+    const userId = document.getElementById('userIdSearch').value.trim();
+    if (!userId) {
+        alert("Please enter a valid User ID (e.g., GIG0001)");
+        return;
+    }
 
     try {
-        const response = await fetch('/api/score', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) throw new Error('API request failed');
+        const response = await fetch(`/api/user/${userId}`);
+        if (!response.ok) {
+            alert(`User ID ${userId} not found! Try GIG0001 to GIG5000.`);
+            return;
+        }
 
         const data = await response.json();
 
-        // Update score text on screen
-        scoreDisplay.textContent = data.karm_score;
-
-        // Update Chart.js dataset dynamically
-        // Assuming data.radar_metrics returns array like [stability, upi, utility, cibil, karm]
-        if (data.radar_metrics) {
-            radarChart.data.datasets[1].data = data.radar_metrics;
-            radarChart.update();
+        // Update trust score
+        if (scoreDisplay) {
+            scoreDisplay.innerText = data.predicted_trust_score;
         }
+
+        // Update UI sliders and labels if available
+        if (volatilityInput && volatilityVal) {
+            volatilityInput.value = data.features.income_volatility;
+            volatilityVal.innerText = `${Math.round(data.features.income_volatility * 100)}%`;
+        }
+        if (upiInput && upiVal) {
+            upiInput.value = data.features.upi_monthly_txns;
+            upiVal.innerText = data.features.upi_monthly_txns;
+        }
+        if (utilityInput && utilityVal) {
+            utilityInput.value = data.features.utility_on_time_ratio;
+            utilityVal.innerText = `${Math.round(data.features.utility_on_time_ratio * 100)}%`;
+        }
+
+        // Update Radar Chart dataset
+        radarChart.data.datasets[1].data = data.radar_values;
+        radarChart.update();
+
     } catch (error) {
-        console.error('Error fetching score:', error);
-        // Fallback for testing UI before backend endpoint is ready
-        scoreDisplay.textContent = Math.round(500 + (payload.utility * 3) - (payload.volatility * 2));
+        console.error("Error fetching user data:", error);
+        alert("Failed to fetch data from backend server.");
     }
 }
-
-// 4. Listeners for Real-Time Slider Movement
-[volatilityInput, upiInput, utilityInput].forEach(slider => {
-    slider.addEventListener('input', () => {
-        // Update label text numbers
-        volatilityVal.textContent = volatilityInput.value;
-        upiVal.textContent = upiInput.value;
-        utilityVal.textContent = utilityInput.value;
-
-        // Trigger API call
-        fetchScore();
-    });
-});
-
-// Initial load call
-fetchScore();

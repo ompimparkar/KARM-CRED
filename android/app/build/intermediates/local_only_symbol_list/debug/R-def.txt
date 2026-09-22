@@ -1,0 +1,13 @@
+R_DEF: Internal format may change without notice
+local
+id btnAnalyze
+id btnGrantPermissions
+id cardContainer
+id etUserId
+id rvReasonCards
+id tvImpactScore
+id tvReasonText
+id tvScore
+layout activity_dashboard
+layout activity_onboarding
+layout item_reason_card
