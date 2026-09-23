@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="accent">#38BDF8</color>
+    <color name="accent_dim">#7DD3FC</color>
+    <color name="band_good">#4ADE80</color>
+    <color name="band_low">#F87171</color>
+    <color name="band_mid">#FACC15</color>
+    <color name="bar_healthy">#4ADE80</color>
+    <color name="bar_overall">#EF4444</color>
+    <color name="bg_dark">#0F172A</color>
+    <color name="bg_deep">#0B1220</color>
+    <color name="bg_panel">#1E293B</color>
+    <color name="bg_panel_alt">#16213B</color>
+    <color name="line">#334155</color>
+    <color name="text_muted">#64748B</color>
+    <color name="text_primary">#F8FAFC</color>
+    <color name="text_secondary">#94A3B8</color>
+    <string name="app_name">KARM CRED</string>
+    <style name="AppTheme" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="colorAccent">@color/accent</item>
+        <item name="android:windowBackground">@color/bg_dark</item>
+        <item name="android:statusBarColor">@color/bg_deep</item>
+        <item name="android:navigationBarColor">@color/bg_deep</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:textColorHint">@color/text_muted</item>
+    </style>
+</resources>

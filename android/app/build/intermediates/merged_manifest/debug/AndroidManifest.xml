@@ -21,15 +21,22 @@
         android:appComponentFactory="androidx.core.app.CoreComponentFactory"
         android:debuggable="true"
         android:extractNativeLibs="false"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/ic_launcher"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+        android:testOnly="true"
+        android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true" >
+
+        <!--
+             Launcher = TrustScore dashboard (root of the 6-section stack);
+             consent gate shows automatically on first launch.
+        -->
         <activity
             android:name="com.example.karmcredapp.MainActivity"
-            android:exported="true" >
+            android:exported="true"
+            android:launchMode="singleTop" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -37,6 +44,41 @@
             </intent-filter>
         </activity>
 
+        <!-- First-launch purpose-bound consent gate (shown before scoring). -->
+        <activity
+            android:name="com.example.karmcredapp.OnboardingActivity"
+            android:exported="false" />
+
+        <!-- The six web sections, mirrored behind the bottom navigation. -->
+        <activity
+            android:name="com.example.karmcredapp.LeaderboardActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.example.karmcredapp.SimulatorActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.example.karmcredapp.CompareActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.example.karmcredapp.FairnessActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.example.karmcredapp.ConsentActivity"
+            android:exported="false" />
+
+        <!--
+             Share score card (ScoreCardExporter) → PNG handed to the system
+             share sheet through this FileProvider.
+        -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.example.karmcredapp.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true" >
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="com.example.karmcredapp.androidx-startup"

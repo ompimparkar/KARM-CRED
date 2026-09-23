@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Page-enter twin of the web router's .page-enter (fade + 12dp rise, 200ms). -->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:interpolator="@android:interpolator/decelerate_quad">
+
+    <alpha
+        android:duration="200"
+        android:fromAlpha="0.0"
+        android:toAlpha="1.0" />
+
+    <translate
+        android:duration="200"
+        android:fromYDelta="4%"
+        android:toYDelta="0" />
+</set>

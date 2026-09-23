@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Cache-backed share target for ScoreCardExporter (share/score_card.png). -->
+<paths>
+    <cache-path name="share" path="share/" />
+</paths>

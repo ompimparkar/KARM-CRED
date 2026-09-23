@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Compare Two Workers: inputs + one-click twins demo + result cards with
+     per-worker gauges, CARD2 skeleton while comparing, particle background. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_dark">
+
+    <com.example.karmcredapp.NetworkBgView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="14dp">
+
+            <EditText
+                android:id="@+id/etCmpA"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Worker A (e.g. TWIN_HEALTHY)"
+                android:inputType="text"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_muted" />
+
+            <EditText
+                android:id="@+id/etCmpB"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:hint="Worker B (e.g. TWIN_RISKY)"
+                android:inputType="text"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_muted" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnCmpRun"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/accent"
+                    android:text="Compare"
+                    android:textColor="@color/bg_dark" />
+
+                <Button
+                    android:id="@+id/btnCmpDemo"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:backgroundTint="@color/accent"
+                    android:text="Load demo twins"
+                    android:textAllCaps="false"
+                    android:textColor="@color/bg_dark"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvCmpState"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="Enter two User IDs, or hit the one-click demo button."
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="12dp">
+
+                <!-- pulsing skeleton while the compare request runs -->
+                <com.example.karmcredapp.SkeletonView
+                    android:id="@+id/cmpSkeleton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" />
+
+                <LinearLayout
+                    android:id="@+id/cmpContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvCmpSummary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="@color/accent_dim"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:lineSpacingExtra="3dp" />
+
+                    <!-- Worker A card with gauge -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="vertical"
+                        android:background="@drawable/bg_panel"
+                        android:padding="14dp">
+
+                        <TextView
+                            android:id="@+id/tvCmpIdA"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Worker A · —"
+                            android:textColor="@color/text_primary"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:orientation="horizontal">
+
+                            <FrameLayout
+                                android:layout_width="84dp"
+                                android:layout_height="84dp">
+
+                                <com.example.karmcredapp.ScoreGaugeView
+                                    android:id="@+id/gaugeA"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent" />
+
+                                <TextView
+                                    android:id="@+id/tvCmpScoreA"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:text="—"
+                                    android:textColor="@color/accent"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold" />
+                            </FrameLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="12dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/tvCmpCohortA"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text=""
+                                    android:textColor="@color/text_muted"
+                                    android:textSize="12sp" />
+
+                                <TextView
+                                    android:id="@+id/tvCmpSummaryA"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:text=""
+                                    android:textColor="@color/text_secondary"
+                                    android:textSize="13sp"
+                                    android:lineSpacingExtra="3dp" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Worker B card with gauge -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="vertical"
+                        android:background="@drawable/bg_panel"
+                        android:padding="14dp">
+
+                        <TextView
+                            android:id="@+id/tvCmpIdB"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Worker B · —"
+                            android:textColor="@color/text_primary"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:orientation="horizontal">
+
+                            <FrameLayout
+                                android:layout_width="84dp"
+                                android:layout_height="84dp">
+
+                                <com.example.karmcredapp.ScoreGaugeView
+                                    android:id="@+id/gaugeB"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent" />
+
+                                <TextView
+                                    android:id="@+id/tvCmpScoreB"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:text="—"
+                                    android:textColor="@color/accent"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold" />
+                            </FrameLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="12dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/tvCmpCohortB"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text=""
+                                    android:textColor="@color/text_muted"
+                                    android:textSize="12sp" />
+
+                                <TextView
+                                    android:id="@+id/tvCmpSummaryB"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:text=""
+                                    android:textColor="@color/text_secondary"
+                                    android:textSize="13sp"
+                                    android:lineSpacingExtra="3dp" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:text="What drives the gap"
+                        android:textColor="@color/text_primary"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvCmpDiff"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:nestedScrollingEnabled="false" />
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+
+        <include layout="@layout/view_bottom_nav" />
+    </LinearLayout>
+</FrameLayout>

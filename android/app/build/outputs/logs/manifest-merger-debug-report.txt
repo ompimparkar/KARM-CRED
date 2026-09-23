@@ -1,9 +1,20 @@
 -- Merging decision tree log ---
+provider#androidx.core.content.FileProvider
+INJECTED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:51:9-59:20
+	android:grantUriPermissions
+		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:55:13-47
+	android:authorities
+		INJECTED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml
+		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:53:13-64
+	android:exported
+		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:54:13-37
+	android:name
+		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:52:13-62
 manifest
-ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:2:1-25:12
-INJECTED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:2:1-25:12
-INJECTED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:2:1-25:12
-INJECTED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:2:1-25:12
+ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:2:1-62:12
+INJECTED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:2:1-62:12
+INJECTED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:2:1-62:12
+INJECTED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:2:1-62:12
 MERGED from [com.google.android.material:material:1.11.0] C:\Users\Om pimparkar\.gradle\caches\transforms-4\7ad739e0f3c20a60a300c840e67f1b4d\transformed\material-1.11.0\AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] C:\Users\Om pimparkar\.gradle\caches\transforms-4\b601b4ddd064d698dd572c5b270b6ecc\transformed\constraintlayout-2.1.4\AndroidManifest.xml:2:1-11:12
 MERGED from [androidx.appcompat:appcompat-resources:1.6.1] C:\Users\Om pimparkar\.gradle\caches\transforms-4\76e5188f1438c6a816ba63124c8bc631\transformed\jetified-appcompat-resources-1.6.1\AndroidManifest.xml:17:1-22:12
@@ -46,20 +57,20 @@ MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\Om pimparkar\.gradl
 MERGED from [androidx.documentfile:documentfile:1.0.0] C:\Users\Om pimparkar\.gradle\caches\transforms-4\6471e337fc7d2b1681c50dc4dcabf94b\transformed\documentfile-1.0.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] C:\Users\Om pimparkar\.gradle\caches\transforms-4\4c3bcf73d7bad86ec594e1c6117fb2e3\transformed\localbroadcastmanager-1.0.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.print:print:1.0.0] C:\Users\Om pimparkar\.gradle\caches\transforms-4\ad4276383aad1cc8b53a98a867fc4392\transformed\print-1.0.0\AndroidManifest.xml:17:1-22:12
-INJECTED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:2:1-25:12
-INJECTED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:2:1-25:12
-INJECTED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:2:1-25:12
+INJECTED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:2:1-62:12
+INJECTED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:2:1-62:12
+INJECTED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:2:1-62:12
 	package
 		INJECTED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml
-		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:2:1-25:12
+		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:2:1-62:12
 		INJECTED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml
 	android:versionName
 		INJECTED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml
-		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:2:1-25:12
+		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:2:1-62:12
 		INJECTED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml
 	android:versionCode
 		INJECTED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml
-		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:2:1-25:12
+		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:2:1-62:12
 		INJECTED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml
 	xmlns:android
 		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:2:11-69
@@ -68,7 +79,7 @@ ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app
 	android:name
 		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:4:22-64
 application
-ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:6:5-23:19
+ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:6:5-60:19
 MERGED from [com.google.android.material:material:1.11.0] C:\Users\Om pimparkar\.gradle\caches\transforms-4\7ad739e0f3c20a60a300c840e67f1b4d\transformed\material-1.11.0\AndroidManifest.xml:22:5-20
 MERGED from [com.google.android.material:material:1.11.0] C:\Users\Om pimparkar\.gradle\caches\transforms-4\7ad739e0f3c20a60a300c840e67f1b4d\transformed\material-1.11.0\AndroidManifest.xml:22:5-20
 MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] C:\Users\Om pimparkar\.gradle\caches\transforms-4\b601b4ddd064d698dd572c5b270b6ecc\transformed\constraintlayout-2.1.4\AndroidManifest.xml:9:5-20
@@ -92,31 +103,69 @@ MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\Om pimparkar\.grad
 	android:label
 		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:9:9-41
 	android:roundIcon
-		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:10:9-54
+		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:10:9-50
 	android:icon
-		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:8:9-43
+		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:8:9-45
 	android:allowBackup
 		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:7:9-35
 	android:theme
-		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:12:9-65
+		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:12:9-40
 	android:usesCleartextTraffic
 		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:13:9-44
 activity#com.example.karmcredapp.MainActivity
-ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:15:9-22:20
+ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:17:9-25:20
+	android:launchMode
+		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:20:13-43
 	android:exported
-		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:17:13-36
+		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:19:13-36
 	android:name
-		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:16:13-41
+		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:18:13-41
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:18:13-21:29
+ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:21:13-24:29
 action#android.intent.action.MAIN
-ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:19:17-69
+ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:22:17-69
 	android:name
-		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:19:25-66
+		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:22:25-66
 category#android.intent.category.LAUNCHER
-ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:20:17-77
+ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:23:17-77
 	android:name
-		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:20:27-74
+		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:23:27-74
+activity#com.example.karmcredapp.OnboardingActivity
+ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:28:9-30:40
+	android:exported
+		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:30:13-37
+	android:name
+		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:29:13-47
+activity#com.example.karmcredapp.LeaderboardActivity
+ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:33:9-35:40
+	android:exported
+		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:35:13-37
+	android:name
+		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:34:13-48
+activity#com.example.karmcredapp.SimulatorActivity
+ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:36:9-38:40
+	android:exported
+		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:38:13-37
+	android:name
+		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:37:13-46
+activity#com.example.karmcredapp.CompareActivity
+ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:39:9-41:40
+	android:exported
+		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:41:13-37
+	android:name
+		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:40:13-44
+activity#com.example.karmcredapp.FairnessActivity
+ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:42:9-44:40
+	android:exported
+		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:44:13-37
+	android:name
+		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:43:13-45
+activity#com.example.karmcredapp.ConsentActivity
+ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:45:9-47:40
+	android:exported
+		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:47:13-37
+	android:name
+		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:46:13-44
 uses-sdk
 INJECTED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml
@@ -215,6 +264,12 @@ INJECTED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\
 		INJECTED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml
 		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml
 		INJECTED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml
+meta-data#android.support.FILE_PROVIDER_PATHS
+ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:56:13-58:54
+	android:resource
+		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:58:17-51
+	android:name
+		ADDED from C:\Users\Om pimparkar\OneDrive\Documents\GitHub\KARM-CRED\android\app\src\main\AndroidManifest.xml:57:17-67
 provider#androidx.startup.InitializationProvider
 ADDED from [androidx.emoji2:emoji2:1.2.0] C:\Users\Om pimparkar\.gradle\caches\transforms-4\c5dce3d20406f51ab89e7246950e9fc3\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:24:9-32:20
 MERGED from [androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\Om pimparkar\.gradle\caches\transforms-4\cd424a0949e37d83b0792726902370a2\transformed\jetified-lifecycle-process-2.6.1\AndroidManifest.xml:24:9-32:20
