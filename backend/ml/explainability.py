@@ -115,6 +115,26 @@ def _first(items, kind):
     return next((it for it in items if it["type"] == kind), None)
 
 
+def items_from_shap(shap_row, feature_names=None) -> list:
+    """Plain-language reason items for one row's SHAP vector (sorted by |impact|).
+
+    Shared by explain_score (single user) and the batch/leaderboard paths so
+    every surface renders reasons from exactly the same code.
+    """
+    names = list(feature_names or MODEL_FEATURES)
+    items = []
+    for feat, val in zip(names, shap_row):
+        impact = round(float(val), 1)
+        items.append({
+            "feature": FEATURE_LABELS.get(feat, feat),
+            "key": feat,
+            "impact_points": impact,
+            "type": "positive" if impact >= 0 else "negative",
+        })
+    items.sort(key=lambda x: abs(x["impact_points"]), reverse=True)
+    return items
+
+
 def build_summary(items) -> str:
     """One natural-language line shown above the reason cards."""
     neg = _first(items, "negative")
@@ -149,6 +169,18 @@ class TrustScoreExplainer:
         """Imputed, ordered model input; tolerant to missing/extra keys."""
         return impute(payload, self.imputer)[self.feature_names]
 
+    def features_frame(self, payload) -> pd.DataFrame:
+        """Public alias: the exact model input frame (used for fairness masks)."""
+        return self._features_frame(payload)
+
+    def predict_many(self, payload) -> np.ndarray:
+        """Vectorized batch scores for a whole DataFrame (ONE predict call)."""
+        return np.asarray(self.model.predict(self._features_frame(payload)))
+
+    def shap_matrix(self, payload) -> np.ndarray:
+        """SHAP matrix (n_rows x n_features) for a whole DataFrame."""
+        return np.asarray(self.explainer.shap_values(self._features_frame(payload)))
+
     def _counterfactuals(self, df_input: pd.DataFrame, payload: dict,
                          base_score: int) -> list:
         out = []
@@ -177,17 +209,7 @@ class TrustScoreExplainer:
 
         predicted = _clamp(float(self.model.predict(df_input)[0]))
         shap_values = np.asarray(self.explainer.shap_values(df_input))[0]
-
-        items = []
-        for feat, val in zip(self.feature_names, shap_values):
-            impact = round(float(val), 1)
-            items.append({
-                "feature": FEATURE_LABELS.get(feat, feat),
-                "key": feat,
-                "impact_points": impact,
-                "type": "positive" if impact >= 0 else "negative",
-            })
-        items.sort(key=lambda x: abs(x["impact_points"]), reverse=True)
+        items = items_from_shap(shap_values, self.feature_names)
 
         return {
             "predicted_trust_score": predicted,

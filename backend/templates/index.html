@@ -8,70 +8,358 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="dashboard-container">
-        <h1>KARM CRED Alternative Scoring Dashboard</h1>
+<div class="app-shell">
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
-        <!-- Search Box for User ID -->
-        <div class="search-box" style="margin-bottom: 1.5rem; display: flex; gap: 10px;">
-            <input type="text" id="userIdSearch" placeholder="Enter User ID (e.g. GIG_0001, or the twins TWIN_HEALTHY / TWIN_RISKY)"
-                   style="padding: 0.75rem; flex: 1; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white;">
-            <button onclick="fetchUserData()" style="padding: 0.75rem 1.5rem; background: #38bdf8; color: #0f172a; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">
-                Analyze User
-            </button>
-        </div>
-
-        <div class="content-grid">
-            <!-- Control Panel -->
-            <div class="control-panel">
-                <h2>User Financial Metrics</h2>
-
-                <div class="score-card">
-                    <h3>Predicted Trust Score</h3>
-                    <div id="score-display">—</div>
-                    <p id="summary-display" class="summary-line"></p>
-                </div>
-
-                <div class="metrics-grid">
-                    <div class="metric"><span>Income Floor</span><b id="m-floor">—</b></div>
-                    <div class="metric"><span>Swings vs. Peers</span><b id="m-cohvol">—</b></div>
-                    <div class="metric"><span>Earnings Trend</span><b id="m-trend">—</b></div>
-                    <div class="metric"><span>Payday Gap Irregularity</span><b id="m-gap">—</b></div>
-                    <div class="metric"><span>Platform Rating</span><b id="m-rating">—</b></div>
-                    <div class="metric"><span>Data Completeness</span><b id="m-completeness">—</b></div>
-                    <div class="metric metric-wide"><span>Cohort</span><b id="m-cohort">—</b></div>
-                </div>
-
-                <div class="slider-group">
-                    <label>Monthly UPI Txns: <span id="upi-val">—</span></label>
-                    <input type="range" id="upi" min="0" max="250" step="1" value="0">
-                </div>
-
-                <div class="slider-group">
-                    <label>Utility Bill Ratio: <span id="utility-val">—</span></label>
-                    <input type="range" id="utility" min="0" max="1" step="0.01" value="0">
-                </div>
-            </div>
-
-            <!-- Chart Panel -->
-            <div class="chart-panel">
-                <h2>Credit Profile Comparison</h2>
-                <canvas id="creditRadarChart"></canvas>
+    <!-- ===== Persistent sidebar navigation ===== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="brand">
+            <div class="brand-mark">◆</div>
+            <div>
+                <div class="brand-name">KARM CRED</div>
+                <div class="brand-tag">Credit for the Invisible</div>
             </div>
         </div>
-
-        <div class="content-grid" style="margin-top: 2rem;">
-            <div class="control-panel">
-                <h2>Why this score (SHAP reason cards)</h2>
-                <ul id="reasons-list" class="impact-list"></ul>
-            </div>
-            <div class="control-panel">
-                <h2>What would improve it (counterfactuals)</h2>
-                <ul id="cf-list" class="impact-list"></ul>
-                <p class="hint">Each suggestion is estimated one change at a time; actual gains may overlap if you make several changes together.</p>
-            </div>
+        <nav class="nav" id="nav">
+            <a href="#/score" data-route="score" class="nav-item active"><span class="nav-ico">◎</span> My TrustScore</a>
+            <a href="#/leaderboard" data-route="leaderboard" class="nav-item"><span class="nav-ico">▲</span> Gigs Leaderboard</a>
+            <a href="#/simulator" data-route="simulator" class="nav-item"><span class="nav-ico">⚙</span> Score Simulator</a>
+            <a href="#/compare" data-route="compare" class="nav-item"><span class="nav-ico">⇄</span> Compare Two Workers</a>
+            <a href="#/fairness" data-route="fairness" class="nav-item"><span class="nav-ico">⚖</span> Fairness &amp; Population</a>
+            <a href="#/consent" data-route="consent" class="nav-item"><span class="nav-ico">🔒</span> Data &amp; Consent</a>
+        </nav>
+        <div class="sidebar-foot">
+            Demo build · synthetic data · scores are illustrative, not a lending decision.
         </div>
-    </div>
+    </aside>
 
-    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+    <!-- ===== Main column ===== -->
+    <div class="main">
+        <header class="topbar">
+            <button class="hamburger" id="hamburger" aria-label="Open navigation">☰</button>
+            <h1 id="pageTitle">My TrustScore</h1>
+        </header>
+
+        <div class="page-wrap">
+
+            <!-- ====================================================== -->
+            <!-- PAGE: My TrustScore (existing single-user lookup flow)  -->
+            <!-- ====================================================== -->
+            <section id="page-score" class="page" data-title="My TrustScore">
+                <!-- Search Box for User ID -->
+                <div class="search-box" style="margin-bottom: 1rem; display: flex; gap: 10px;">
+                    <input type="text" id="userIdSearch" placeholder="Enter User ID (e.g. GIG_0001, or the twins TWIN_HEALTHY / TWIN_RISKY)"
+                           style="padding: 0.75rem; flex: 1; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white;">
+                    <button onclick="fetchUserData()" style="padding: 0.75rem 1.5rem; background: #38bdf8; color: #0f172a; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">
+                        Analyze User
+                    </button>
+                </div>
+                <p id="scoreState" class="page-state empty">Enter a User ID above — try <code>GIG_0001</code>, or the seeded twins <code>TWIN_HEALTHY</code> / <code>TWIN_RISKY</code> (identical income &amp; volatility, opposite risk patterns).</p>
+
+                <div class="content-grid">
+                    <!-- Control Panel -->
+                    <div class="control-panel">
+                        <h2>User Financial Metrics</h2>
+
+                        <div class="score-card">
+                            <h3>Predicted Trust Score</h3>
+                            <div id="score-display">—</div>
+                            <p id="summary-display" class="summary-line"></p>
+                        </div>
+
+                        <div class="metrics-grid">
+                            <div class="metric"><span>Income Floor</span><b id="m-floor">—</b></div>
+                            <div class="metric"><span>Swings vs. Peers</span><b id="m-cohvol">—</b></div>
+                            <div class="metric"><span>Earnings Trend</span><b id="m-trend">—</b></div>
+                            <div class="metric"><span>Payday Gap Irregularity</span><b id="m-gap">—</b></div>
+                            <div class="metric"><span>Platform Rating</span><b id="m-rating">—</b></div>
+                            <div class="metric"><span>Data Completeness</span><b id="m-completeness">—</b></div>
+                            <div class="metric metric-wide"><span>Cohort</span><b id="m-cohort">—</b></div>
+                        </div>
+
+                        <div class="slider-group">
+                            <label>Monthly UPI Txns: <span id="upi-val">—</span></label>
+                            <input type="range" id="upi" min="0" max="250" step="1" value="0">
+                        </div>
+
+                        <div class="slider-group">
+                            <label>Utility Bill Ratio: <span id="utility-val">—</span></label>
+                            <input type="range" id="utility" min="0" max="1" step="0.01" value="0">
+                        </div>
+                    </div>
+
+                    <!-- Chart Panel -->
+                    <div class="chart-panel">
+                        <h2>Credit Profile Comparison</h2>
+                        <canvas id="creditRadarChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="content-grid" style="margin-top: 2rem;">
+                    <div class="control-panel">
+                        <h2>Why this score (SHAP reason cards)</h2>
+                        <ul id="reasons-list" class="impact-list"></ul>
+                    </div>
+                    <div class="control-panel">
+                        <h2>What would improve it (counterfactuals)</h2>
+                        <ul id="cf-list" class="impact-list"></ul>
+                        <p class="hint">Each suggestion is estimated one change at a time; actual gains may overlap if you make several changes together.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====================================================== -->
+            <!-- PAGE: Gigs Leaderboard                                  -->
+            <!-- ====================================================== -->
+            <section id="page-leaderboard" class="page" data-title="Gigs Leaderboard" hidden>
+                <p class="page-lede">Where does a worker sit relative to the whole population? Every card links back to
+                    <b>My TrustScore</b> — with the raw stats that explain <i>why</i> it landed in its band, not just the number.</p>
+
+                <div class="tabs" id="lbTabs">
+                    <button class="tab active" data-tab="top">Top Performers</button>
+                    <button class="tab" data-tab="middle">Building Trust</button>
+                    <button class="tab" data-tab="bottom">Needs Support</button>
+                </div>
+
+                <p id="lbState" class="page-state loading">Scoring the population (first load builds the score cache)…</p>
+                <div id="lb-top" class="card-grid" data-panel="top" hidden></div>
+                <div id="lb-middle" class="card-grid" data-panel="middle" hidden></div>
+                <div id="lb-bottom" class="card-grid" data-panel="bottom" hidden></div>
+                <p class="hint" id="lbMeta"></p>
+            </section>
+
+            <!-- ====================================================== -->
+            <!-- PAGE: Score Simulator (what-if)                         -->
+            <!-- ====================================================== -->
+            <section id="page-simulator" class="page" data-title="Score Simulator" hidden>
+                <p class="page-lede">Drag sliders for a <b>hypothetical</b> gig worker — no User ID needed. The score, SHAP
+                    reasons and improvement suggestions update live (debounced). Start from the dataset median worker, then
+                    break one thing at a time to see what actually matters.</p>
+
+                <p id="simState" class="page-state loading">Loading slider ranges from the training data…</p>
+                <div id="simBody" class="sim-layout" hidden>
+                    <div class="control-panel">
+                        <div class="sim-toolbar">
+                            <h2>Profile controls</h2>
+                            <button id="simReset" class="btn ghost">Reset to typical gig worker</button>
+                        </div>
+                        <div id="simSliders" class="sim-sliders"></div>
+                    </div>
+                    <div class="control-panel">
+                        <div class="score-card sim-score">
+                            <h3>Hypothetical Trust Score</h3>
+                            <div id="sim-score" class="score-value">—</div>
+                            <p id="sim-summary" class="summary-line"></p>
+                        </div>
+                        <div class="hint-box" id="simHint" hidden>
+                            <b>Biggest lever right now:</b> <span id="simHintText"></span>
+                        </div>
+                        <h2 class="mt">Why this score (SHAP reasons)</h2>
+                        <ul id="sim-reasons" class="impact-list"></ul>
+                        <h2 class="mt">What would improve it</h2>
+                        <ul id="sim-cf" class="impact-list"></ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====================================================== -->
+            <!-- PAGE: Compare Two Workers                               -->
+            <!-- ====================================================== -->
+            <section id="page-compare" class="page" data-title="Compare Two Workers" hidden>
+                <p class="page-lede">Two workers, one question: do <b>identical averages and identical raw swings</b> produce
+                    identical scores? (Spoiler: no — structure beats noise.) Load the seeded twins for a 10-second demo.</p>
+
+                <div class="compare-controls">
+                    <div class="field"><label for="cmpA">Worker A</label>
+                        <input type="text" id="cmpA" placeholder="e.g. TWIN_HEALTHY"></div>
+                    <div class="field"><label for="cmpB">Worker B</label>
+                        <input type="text" id="cmpB" placeholder="e.g. TWIN_RISKY"></div>
+                    <button id="cmpRun" class="btn">Compare</button>
+                    <button id="cmpPreset" class="btn ghost">Load demo pair (twins)</button>
+                </div>
+
+                <p id="cmpState" class="page-state empty">Enter two User IDs above, or load the demo pair.</p>
+                <div id="cmpBody" hidden>
+                    <div class="compare-summary" id="cmpSummary"></div>
+
+                    <div class="compare-cards">
+                        <div class="score-card" id="cmpCardA"></div>
+                        <div class="score-card" id="cmpCardB"></div>
+                    </div>
+
+                    <div class="content-grid" style="margin-top: 1.5rem;">
+                        <div class="control-panel">
+                            <h2>Shape of the profile</h2>
+                            <canvas id="compareRadar"></canvas>
+                        </div>
+                        <div class="control-panel">
+                            <h2>What drives the gap</h2>
+                            <ul id="cmpDiff" class="impact-list"></ul>
+                            <p class="hint">Difference in SHAP contribution per feature (A − B). These are the only reasons
+                                the scores differ — plain diff of the model's own attributions, no new logic.</p>
+                        </div>
+                    </div>
+
+                    <div class="control-panel" style="margin-top: 1.5rem;">
+                        <h2>Feature-by-feature</h2>
+                        <div class="table-scroll">
+                            <table class="feature-table" id="cmpTable">
+                                <thead>
+                                    <tr><th>Feature</th><th>A</th><th>B</th><th>SHAP A</th><th>SHAP B</th><th>Δ pts</th></tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <p class="hint">Highlighted rows = the features that explain the most of the score gap.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====================================================== -->
+            <!-- PAGE: Fairness & Population Insights                    -->
+            <!-- ====================================================== -->
+            <section id="page-fairness" class="page" data-title="Fairness &amp; Population Insights" hidden>
+                <p class="page-lede">Evidence for the problem statement's twist: a flat "income volatility" feature would
+                    systematically underscore exactly the workers alternative scoring exists to help.</p>
+
+                <p id="fairState" class="page-state loading">Crunching population stats (first load runs one batch SHAP pass)…</p>
+                <div id="fairBody" hidden>
+
+                    <div class="control-panel">
+                        <h2>What this page proves</h2>
+                        <p class="explain-copy">
+                            Bucket every worker into <b>deciles of swings-vs-peers</b> (<code>cohort_adjusted_volatility</code> —
+                            seasonality for their gig/city already removed) and the <span class="hl-red">red line (all workers)</span>
+                            falls with volatility — because unusual swings often <i>do</i> travel with genuinely risky patterns
+                            (thin income floor, shrinking earnings). That is the model doing its job: penalising risk signals.
+                        </p>
+                        <p class="explain-copy">
+                            The <span class="hl-green">green line keeps only otherwise-healthy workers</span> (floor ≥ 25% of a
+                            typical week, non-negative trend, utility on-time ≥ 70% — the same mask the training-time fairness
+                            gate enforces). Their average score does <b>not</b> fall as swings grow: the wildest decile scores
+                            <b id="exDecGap">—</b> <i>above</i> the smoothest (tolerance ±<span id="exTol">30</span> pts).
+                            High variability with a healthy structure is not being punished — the claim, in one chart.
+                        </p>
+                    </div>
+
+                    <div class="stat-row" style="margin-top: 1.5rem;">
+                        <div class="stat">
+                            <span>Healthy · top-quartile RAW swings</span>
+                            <b id="stHi">—</b><small id="stHiN"></small>
+                        </div>
+                        <div class="stat">
+                            <span>Bottom-quartile RAW swings (all)</span>
+                            <b id="stLo">—</b><small id="stLoN"></small>
+                        </div>
+                        <div class="stat">
+                            <span>Gap (healthy swingy − smooth)</span>
+                            <b id="stGap">—</b><small id="stGapNote"></small>
+                        </div>
+                        <div class="stat">
+                            <span>Healthy D10 − D1 (same as gate)</span>
+                            <b id="stDec">—</b><small>training-time tolerance ±30 pts</small>
+                        </div>
+                    </div>
+
+                    <div class="content-grid" style="margin-top: 1.5rem;">
+                        <div class="control-panel">
+                            <h2>Avg score by swings-vs-peers decile</h2>
+                            <p class="hint">D1 smoothest → D10 wildest. Bars = all workers; green = otherwise-healthy only.
+                                Vertical axis zoomed to 400–750 to make differences visible.</p>
+                            <canvas id="decileChart"></canvas>
+                        </div>
+                        <div class="control-panel">
+                            <h2>Score distribution</h2>
+                            <canvas id="histChart"></canvas>
+                            <div class="chip-row" id="popStats"></div>
+                        </div>
+                    </div>
+
+                    <div class="content-grid" style="margin-top: 1.5rem;">
+                        <div class="control-panel">
+                            <h2>What the model actually uses (global SHAP)</h2>
+                            <p class="hint">Mean |SHAP| across all <span id="impN">—</span> workers — one batch pass, cached.</p>
+                            <canvas id="importanceChart"></canvas>
+                        </div>
+                        <div class="control-panel">
+                            <h2>Reading this for a lender</h2>
+                            <p class="explain-copy" id="lenderCopy">—</p>
+                            <div class="verdict" id="fairVerdict"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====================================================== -->
+            <!-- PAGE: Data & Consent                                    -->
+            <!-- ====================================================== -->
+            <section id="page-consent" class="page" data-title="Data &amp; Consent" hidden>
+                <div class="badge-row">
+                    <span class="badge warn">Demo scope — grants live in this browser only (localStorage); not production consent infrastructure</span>
+                    <span class="badge">Mirror of the Android onboarding consent flow</span>
+                </div>
+
+                <p class="page-lede">Every source the model <i>can</i> use is opt-in. Deny one and its features are nulled
+                    <b>server-side before inference</b> — not merely hidden in the UI — then cohort-imputed and the
+                    explanation is honest about the thinner profile.</p>
+
+                <div class="source-grid" id="sourceGrid">
+                    <p class="page-state loading">Loading data sources…</p>
+                </div>
+
+                <div class="control-panel" style="margin-top: 1.5rem;">
+                    <h2>Effect of your grants (live)</h2>
+                    <p class="hint">Re-scores <b id="cpWho">GIG_0001</b> with <code>?consent=…</code> on every toggle.
+                        Feature chips below grey out when their source is withheld.</p>
+                    <div class="stat-row mini" style="margin-top: 0.8rem;">
+                        <div class="stat"><span>Score with these grants</span><b id="cpScore">—</b></div>
+                        <div class="stat"><span>vs. all sources granted</span><b id="cpDelta">—</b></div>
+                        <div class="stat"><span>Effective completeness</span><b id="cpComplete">—</b></div>
+                    </div>
+                    <p class="summary-line" id="cpSummary"></p>
+                    <div class="feature-chips" id="featureChips"></div>
+                    <p id="cpState" class="page-state empty" hidden></p>
+                </div>
+
+                <div class="content-grid" style="margin-top: 1.5rem;">
+                    <div class="control-panel">
+                        <h2>How your data is handled</h2>
+                        <ul class="doc-list">
+                            <li><b>What's stored:</b> in this demo, only your consent grants (browser localStorage) and the
+                                API's in-memory synthetic profiles (SQLite, wiped on restart). No real PII enters the system.</li>
+                            <li><b>Derived vs. sent:</b> pattern features (income floor, trend, swings-vs-peers, payday gaps,
+                                savings ratio) are computed from your earnings history; the raw SMS/UPI records are never
+                                forwarded by this app — only derived aggregates reach the API.</li>
+                            <li><b>Enforcement, not decoration:</b> a denied source's features are set to null inside the API
+                                before the model runs (see <code>backend/app.py</code> consent gate); the model literally never
+                                receives them — it falls back to cohort-median imputation and reports lower
+                                <i>data completeness</i>.</li>
+                            <li><b>Retention:</b> demo data lives only for the server process; kill the Flask process and it's
+                                gone. A production build would keep consent-scoped records only for the purpose granted.</li>
+                        </ul>
+                    </div>
+                    <div class="control-panel">
+                        <h2>Production path (beyond this demo)</h2>
+                        <ul class="doc-list">
+                            <li><b>Account Aggregator (AA) framework:</b> RBI-regulated, consent-based financial data sharing
+                                through FIPs/FUs — grants would be purpose-limited, time-boxed and revocable at the AA layer,
+                                instead of localStorage.</li>
+                            <li><b>RBI digital lending guidelines (2022):</b> explicit borrower consent for data use, data
+                                minimisation, and traceability of lending-service partners.</li>
+                            <li><b>Algorithmic transparency &amp; fairness:</b> reason codes handed to the applicant (the SHAP
+                                cards), periodic bias audits (the Fairness page's decile test), and a human grievance path —
+                                required in spirit by the guidelines and by fair-lending norms.</li>
+                            <li><b>DPDP Act 2023:</b> notice + consent per purpose, withdrawal as easy as grant, erasure on
+                                demand, and data-fiduciary accountability for automated decisions affecting individuals.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+        </div><!-- /page-wrap -->
+    </div><!-- /main -->
+</div><!-- /app-shell -->
+
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 </body>
 </html>
