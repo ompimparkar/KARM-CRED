@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Persistent bottom navigation - included at the bottom of every section
+     layout so the app mirrors the web sidebar (6 items, dark + cyan). -->
+<com.google.android.material.bottomnavigation.BottomNavigationView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bottomNav"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/bg_deep"
+    app:itemIconTint="@color/nav_tint"
+    app:itemTextColor="@color/nav_tint"
+    app:itemActiveIndicatorColor="#3338BDF8"
+    app:labelVisibilityMode="labeled"
+    app:elevation="8dp"
+    app:menu="@menu/bottom_nav_menu" />

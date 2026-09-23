@@ -3,30 +3,58 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:background="@color/bg_dark">
 
-    <Button
-        android:id="@+id/btnManageConsent"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:text="Manage Data Sources"
-        android:textSize="12sp"
-        style="?android:attr/borderlessButtonStyle" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="14dp"
+        android:paddingBottom="4dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="My TrustScore"
+            android:textColor="@color/text_primary"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnManageConsent"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Manage data sources"
+            android:textColor="@color/accent"
+            android:textSize="12sp" />
+    </LinearLayout>
 
     <EditText
         android:id="@+id/etUserId"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:hint="Enter User ID (e.g. GIG_0001, TWIN_HEALTHY)"
-        android:inputType="text" />
+        android:inputType="text"
+        android:textColor="@color/text_primary"
+        android:textColorHint="@color/text_muted" />
 
     <Button
         android:id="@+id/btnAnalyze"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginTop="8dp"
-        android:text="Analyze" />
+        android:backgroundTint="@color/accent"
+        android:text="Analyze"
+        android:textColor="@color/bg_dark" />
 
     <TextView
         android:id="@+id/tvScore"
@@ -35,7 +63,8 @@
         android:layout_marginTop="16dp"
         android:gravity="center"
         android:text="—"
-        android:textSize="32sp"
+        android:textColor="@color/accent"
+        android:textSize="36sp"
         android:textStyle="bold" />
 
     <TextView
@@ -43,10 +72,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:gravity="center"
         android:text=""
+        android:textColor="@color/text_secondary"
         android:textSize="13sp"
-        android:textColor="#555555"
         android:lineSpacingExtra="2dp" />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -56,6 +87,9 @@
         android:layout_weight="1"
         android:layout_marginTop="16dp"
         android:clipToPadding="false"
-        android:paddingBottom="16dp" />
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="8dp" />
 
+    <include layout="@layout/view_bottom_nav" />
 </LinearLayout>

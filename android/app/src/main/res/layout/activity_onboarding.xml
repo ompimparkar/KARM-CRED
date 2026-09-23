@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="@color/bg_dark">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,14 +16,15 @@
             android:text="KARM CRED"
             android:textSize="28sp"
             android:textStyle="bold"
-            android:textColor="#008080" />
+            android:textColor="@color/accent" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="Where Your Daily Hustle Builds Your Credit"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:textColor="@color/text_secondary" />
 
         <TextView
             android:layout_width="match_parent"
@@ -31,6 +32,7 @@
             android:layout_marginTop="20dp"
             android:text="To evaluate your TrustScore without salary slips, we read specific data sources on this device. Choose exactly which ones you allow. This is purpose-bound consent under India's DPDP Act: you can change or revoke any grant later from the dashboard."
             android:textSize="14sp"
+            android:textColor="@color/text_secondary"
             android:lineSpacingExtra="4dp" />
 
         <TextView
@@ -40,7 +42,7 @@
             android:text="Data sources you do NOT allow are never sent for scoring - the model only sees the sources you grant below."
             android:textSize="13sp"
             android:textStyle="italic"
-            android:textColor="#555555" />
+            android:textColor="@color/band_mid" />
 
         <CheckBox
             android:id="@+id/chkUpi"
@@ -48,6 +50,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="UPI &amp; bank SMS metadata (payment frequency, on-time behaviour)"
+            android:textColor="@color/text_primary"
             android:textSize="15sp" />
 
         <CheckBox
@@ -56,6 +59,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="Utility bill reminders (electricity / phone bill punctuality)"
+            android:textColor="@color/text_primary"
             android:textSize="15sp" />
 
         <CheckBox
@@ -64,6 +68,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="Gig platform profile &amp; ratings (average rating, rating trend)"
+            android:textColor="@color/text_primary"
             android:textSize="15sp" />
 
         <TextView
@@ -72,7 +77,7 @@
             android:layout_marginTop="16dp"
             android:text="In production this consent flow rides India's Account Aggregator framework for UPI/bank data; this demo simulates on-device SMS parsing instead. No chat data is ever read."
             android:textSize="12sp"
-            android:textColor="#777777"
+            android:textColor="@color/text_muted"
             android:lineSpacingExtra="3dp" />
 
         <Button
@@ -81,7 +86,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="Continue With Selected Sources"
-            android:backgroundTint="#008080" />
+            android:backgroundTint="@color/accent"
+            android:textColor="@color/bg_dark" />
 
         <Button
             android:id="@+id/btnGrantAll"
@@ -89,6 +95,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="Allow All &amp; Calculate Score"
-            android:backgroundTint="#008080" />
+            android:backgroundTint="@color/accent"
+            android:textColor="@color/bg_dark" />
     </LinearLayout>
 </ScrollView>

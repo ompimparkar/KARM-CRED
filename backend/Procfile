@@ -1,0 +1,2 @@
+# For platforms configured with root directory = backend/
+web: gunicorn app:app

@@ -96,5 +96,29 @@ See **[`MODEL_CARD.md`](MODEL_CARD.md)** — features and meanings, label constr
 *   **Aryan** - Mobile Frontend Development
 *   **Atharva** - Mobile Frontend Development
 
+## 📦 Production deploy
+
+- `backend/requirements.txt` ships **gunicorn** alongside Flask. Two `Procfile`s are provided: the root one (`gunicorn --chdir backend app:app`) for platforms that deploy from the repo root, and `backend/Procfile` (`gunicorn app:app`) for platforms whose root directory is set to `backend/`.
+- `.env.example` documents every environment knob: `ALLOWED_ORIGINS` (CORS allow-list — add your LAN IP when opening the dashboard from another device), `FLASK_DEBUG` (local only — never expose the debug console), `KARM_HTTPS`, `KARM_HOST`, `KARM_PORT`.
+- `GET /api/health` returns `{"status": "ok", "cache_built": true|false}` — `cache_built` tells you whether the population views have been computed in this process yet (i.e. the instance is warm).
+- ⚠️ **`_CACHE` is process-lifetime only.** The batch-scored population, leaderboard and fairness results live in a plain in-memory dict in `backend/app.py`; nothing is written to disk. Every restart/redeploy rebuilds them on first use (a few seconds for the first leaderboard/fairness hit, then cached for the life of that process). Scale horizontally with that in mind: each worker process owns its own cache.
+
+## 🧪 Tests & CI
+
+- `backend/tests/test_api.py` — pytest suite over all six endpoints plus the 404 (unknown user) and 422 (malformed `/api/simulate`) paths. Run from `backend/`: `python -m pytest tests -q`.
+- `.github/workflows/ci.yml` runs on every push/PR: install → `ml/generate_data.py` → `ml/train_model.py` → `ml/validate_twins.py` → `ml/fairness_check.py` → `pytest tests`. Artifacts are regenerated from scratch in CI, so a stale committed model can never mask a regression.
+
+## 📱 Android app (full 6-section parity)
+
+`android/` mirrors all six web sections through a Material `BottomNavigationView` (Score, Leaderboard, Simulator, Compare, Fairness, Consent) on the same dark theme + cyan accent, reusing the existing `ApiService` and `ConsentManager`:
+
+```bash
+cd android
+# Point at your machine's Flask server (emulator default is 10.0.2.2):
+./gradlew assembleDebug -PKARM_API_BASE_URL="http://<your-lan-ip>:5000/"
+```
+
+First launch gates on the consent screen (grant each source or no scoring happens); the Consent section later lets you revoke and re-score live.
+
 ---
 *Developed for CODEX 2026 - MUSA*

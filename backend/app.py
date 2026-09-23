@@ -578,6 +578,20 @@ def feature_defaults():
     return jsonify(_defaults_payload())
 
 
+@app.route("/api/health")
+def health():
+    """Liveness + cache warmth for deploy checks (Render/Railway/Fly).
+
+    cache_built is True once the population views (whole-dataset scores,
+    leaderboard, fairness) have been computed at least once in this
+    process - i.e. the instance is "warm" and page loads will be fast.
+    NOTE: _CACHE is process-lifetime only; it is rebuilt from scratch
+    after every restart (see README "Production deploy").
+    """
+    warm = all(k in _CACHE for k in ("scores", "leaderboard", "fairness"))
+    return jsonify({"status": "ok", "cache_built": warm})
+
+
 if __name__ == "__main__":
     debug = os.environ.get("FLASK_DEBUG", "0") == "1"
     if debug:

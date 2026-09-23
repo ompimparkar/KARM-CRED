@@ -25,10 +25,93 @@ function setScore(el, score) {
         (has(score) ? ' ' + bandOf(score) : '');
 }
 
+/* ---- P0: one shared score-reveal utility (count-up + SVG arc + band) ----
+ * Used by My TrustScore, Score Simulator and Compare — never triplicated.
+ * Counts from 300 (or the previous value) with an ease-out over ~800ms,
+ * drives the radial gauge's stroke-dashoffset in lockstep, and crossfades
+ * the band colour (text + arc) as the number crosses thresholds. */
+const PREFERS_REDUCED = window.matchMedia &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const BAND_COLORS = { good: '#4ade80', mid: '#facc15', low: '#f87171' };
+const GAUGE_C = 326.73; // 2πr for r=52
+
+function setGauge(wrap, frac, band) {
+    const fill = wrap.querySelector('.gauge-fill');
+    if (!fill) return;
+    const clamped = Math.max(0, Math.min(1, frac));
+    fill.style.strokeDashoffset = (GAUGE_C * (1 - clamped)).toFixed(2);
+    fill.style.stroke = BAND_COLORS[band] || BAND_COLORS.mid;
+}
+
+function animateScoreTo(el, to, opts = {}) {
+    if (!el || !has(to)) return;
+    const wrap = el.closest ? el.closest('.gauge-wrap') : null;
+    const duration = opts.duration || 800;                 // 600–900ms budget
+    if (el._rafId) { cancelAnimationFrame(el._rafId); el._rafId = null; }
+
+    const prev = parseInt(String(el.textContent).replace(/[^0-9-]/g, ''), 10);
+    const from = has(opts.from) ? opts.from :
+        (Number.isFinite(prev) ? prev : 300);
+
+    const paint = (val, b) => {
+        el.textContent = Math.round(val);
+        el.classList.remove('good', 'mid', 'low');
+        el.classList.add(b);                               // colour crossfade
+        if (wrap) setGauge(wrap, (val - 300) / 600, b);    // 300–900 → 0–1
+    };
+
+    const finalBand = bandOf(to);
+    if (PREFERS_REDUCED || from === to) { paint(to, finalBand); return; }
+
+    const t0 = performance.now();
+    const tick = (now) => {
+        const t = Math.min(1, (now - t0) / duration);
+        const eased = 1 - Math.pow(1 - t, 3);              // ease-out cubic
+        const val = from + (to - from) * eased;
+        paint(val, bandOf(val));
+        if (t < 1) {
+            el._rafId = requestAnimationFrame(tick);
+        } else {
+            paint(to, finalBand);
+            el._rafId = null;
+        }
+    };
+    paint(from, bandOf(from));
+    el._rafId = requestAnimationFrame(tick);
+}
+
+/* ---- P0: skeleton loaders — every plain "Loading…" text state becomes
+ * pulsing placeholder blocks shaped like the content about to appear ---- */
+const SK = {
+    def: '<div class="skel-grid">' +
+        '<div class="skel sk-card"></div><div class="skel sk-card"></div>' +
+        '<div class="skel sk-card"></div></div>',
+    score: '<div class="skel sk-line w60"></div><div class="skel-grid">' +
+        '<div class="skel sk-card"></div><div class="skel sk-chart"></div></div>',
+    lb: '<div class="skel-grid">' +
+        '<div class="skel sk-card"></div>'.repeat(6) + '</div>',
+    sim: '<div class="skel-grid"><div class="skel sk-tall"></div>' +
+        '<div class="skel sk-tall"></div></div>',
+    cmp: '<div class="skel-grid two"><div class="skel sk-card"></div>' +
+        '<div class="skel sk-card"></div></div>',
+    fair: '<div class="skel-grid four">' +
+        '<div class="skel sk-stat"></div>'.repeat(4) +
+        '</div><div class="skel sk-chart"></div>'
+};
+
 function setState(el, cls, html) {
     if (!el) return;
     if (!cls) { el.hidden = true; el.textContent = ''; return; }
     el.hidden = false;
+    if (cls === 'loading') {
+        const fam = {
+            scoreState: 'score', lbState: 'lb', simState: 'sim',
+            cmpState: 'cmp', fairState: 'fair'
+        }[el.id];
+        el.className = 'page-state skel';
+        el.innerHTML = (fam && SK[fam]) || SK.def;
+        return;
+    }
     el.className = 'page-state ' + cls;
     el.innerHTML = html || '';
 }
@@ -73,16 +156,22 @@ function ensureDefaults() {
     return defaultsPromise;
 }
 
-// -------------------------------------------------------- shared render --
+// ---------------------------------------------------- shared render ------
+/* ---- SHAP impact bars: grow from 0 to their value on first render ---- */
 function renderReasons(el, reasons) {
     if (!el) return;
     el.innerHTML = '';
-    (reasons || []).forEach((r) => {
+    const list = reasons || [];
+    const maxAbs = Math.max(1, ...list.map((r) => Math.abs(r.impact_points)));
+    list.forEach((r) => {
         const li = document.createElement('li');
         li.className = r.type === 'negative' ? 'neg' : 'pos';
         const s = r.impact_points >= 0 ? '+' : '';
+        const w = Math.max(4, Math.round(
+            Math.abs(r.impact_points) / maxAbs * 100));
         li.innerHTML = `<span class="impact">${s}${r.impact_points}</span>` +
-            `<span class="label">${r.feature}</span>`;
+            `<span class="label">${r.feature}` +
+            `<span class="bar"><i style="--w:${w}%"></i></span></span>`;
         el.appendChild(li);
     });
 }
@@ -90,14 +179,19 @@ function renderReasons(el, reasons) {
 function renderCounterfactuals(el, cfs) {
     if (!el) return;
     el.innerHTML = '';
-    (cfs || []).forEach((cf) => {
+    const list = cfs || [];
+    const maxAbs = Math.max(1, ...list.map((cf) => Math.abs(cf.delta_points)));
+    list.forEach((cf) => {
         const li = document.createElement('li');
         li.className = 'cf';
+        const w = Math.max(4, Math.round(
+            Math.abs(cf.delta_points) / maxAbs * 100));
         li.innerHTML = `<span class="impact">+${Math.round(cf.delta_points)}</span>` +
-            `<span class="label">${cf.action}</span>`;
+            `<span class="label">${cf.action}` +
+            `<span class="bar"><i style="--w:${w}%"></i></span></span>`;
         el.appendChild(li);
     });
-    if (!(cfs || []).length) {
+    if (!list.length) {
         const li = document.createElement('li');
         li.className = 'cf';
         li.innerHTML = '<span class="label">No single change would add 3+ points — profile is already strong.</span>';
@@ -128,9 +222,22 @@ const mCohort = document.getElementById('m-cohort');
 let radarChart = null;
 let lastScoredUserId = null;  // used by the Data & Consent live preview
 
+/* One dark tooltip style shared by all five charts (Chart.js v3+). */
+const CHART_TOOLTIP = {
+    backgroundColor: '#0f172a',
+    borderColor: '#38bdf8',
+    borderWidth: 1,
+    titleColor: '#e2e8f0',
+    bodyColor: '#bae6fd',
+    padding: 10,
+    cornerRadius: 8,
+    displayColors: false,
+};
+
 function radarOptions() {
     return {
         responsive: true,
+        animation: { duration: PREFERS_REDUCED ? 0 : 900, easing: 'easeOutQuart' },
         scales: {
             r: {
                 angleLines: { color: '#334155' },
@@ -141,7 +248,10 @@ function radarOptions() {
                 suggestedMax: 100,
             },
         },
-        plugins: { legend: { labels: { color: '#e2e8f0' } } },
+        plugins: {
+            legend: { labels: { color: '#e2e8f0' } },
+            tooltip: CHART_TOOLTIP,   // radar polygon grows outward from centre
+        },
     };
 }
 
@@ -178,9 +288,16 @@ function renderScorePage(data) {
     const f = data.features || {};
     const state = document.getElementById('scoreState');
 
-    // Trust score + one-line natural-language summary
-    setScore(scoreDisplay, data.predicted_trust_score);
+    // Trust score + one-line natural-language summary (shared count-up
+    // reveal: 300 → value with SVG arc + band crossfade, ~800ms)
+    animateScoreTo(scoreDisplay, data.predicted_trust_score);
     if (summaryDisplay) summaryDisplay.innerText = data.summary || '';
+
+    // Print / "Download PDF" report header
+    const pw = document.getElementById('printWho');
+    if (pw) pw.textContent = `${data.user_id} · ${cohortStr(data.cohort)}`;
+    const pd = document.getElementById('printDate');
+    if (pd) pd.textContent = new Date().toLocaleString('en-IN');
 
     // Sliders (null-safe: partial profiles may lack a source)
     if (upiInput && upiVal) {
@@ -292,12 +409,9 @@ const ON_ENTER = {
 function navigate() {
     const route = routeFromHash();
     if (route === currentRoute) return;
+    const prevRoute = currentRoute;
     currentRoute = route;
 
-    ROUTES.forEach((r) => {
-        const page = document.getElementById('page-' + r);
-        if (page) page.hidden = (r !== route);
-    });
     document.querySelectorAll('.nav-item').forEach((a) => {
         a.classList.toggle('active', a.dataset.route === route);
     });
@@ -305,6 +419,32 @@ function navigate() {
     const title = document.getElementById('pageTitle');
     if (page && title) title.textContent = page.dataset.title || '';
     closeSidebar();
+
+    // Outgoing page: leave the flow immediately and cross-fade out (170ms).
+    // The guard stops a rapid A→B→A round-trip from hiding the new page.
+    const prevPage = prevRoute ? document.getElementById('page-' + prevRoute) : null;
+    if (prevPage && !prevPage.hidden && prevPage !== page) {
+        const leftRoute = prevRoute;
+        prevPage.classList.remove('page-enter');
+        prevPage.classList.add('page-leaving');
+        window.setTimeout(() => {
+            prevPage.classList.remove('page-leaving');
+            if (currentRoute !== leftRoute) prevPage.hidden = true;
+        }, 170);
+    }
+
+    // Incoming page: fade/translate in, stagger cards (.stagger-item --i).
+    ROUTES.forEach((r) => {
+        const el = document.getElementById('page-' + r);
+        if (el && el !== page) el.classList.remove('page-enter');
+    });
+    if (page) {
+        page.hidden = false;
+        page.classList.remove('page-enter', 'page-leaving');
+        void page.offsetWidth;   // force reflow so the animation restarts
+        page.classList.add('page-enter');
+    }
+
     if (ON_ENTER[route]) ON_ENTER[route]();
     window.scrollTo({ top: 0 });
 }
@@ -338,7 +478,12 @@ async function ensureLeaderboard() {
 function renderLeaderboard(lb) {
     ['top', 'middle', 'bottom'].forEach((tab) => {
         const el = document.getElementById('lb-' + tab);
-        if (el) el.innerHTML = lb[tab].map(lbCardHtml).join('');
+        if (el) {
+            // --i drives the staggered entrance; capped at 10 so total
+            // animation budget stays ~400ms (10 × 40ms).
+            el.innerHTML = lb[tab].map(
+                (e, i) => lbCardHtml(e, Math.min(i, 10))).join('');
+        }
     });
     // only the active tab visible (default: top)
     const active = document.querySelector('#lbTabs .tab.active');
@@ -348,13 +493,23 @@ function renderLeaderboard(lb) {
     });
 }
 
-function lbCardHtml(e) {
+function lbCardHtml(e, staggerIndex) {
     const s = e.predicted_trust_score;
-    const reasons = (e.top_reasons || []).map((r) =>
-        `<li class="${r.type}"><span class="impact">${r.impact_points >= 0 ? '+' : ''}${r.impact_points}</span>` +
-        `<span class="label">${r.feature}</span></li>`).join('');
+    const topReasons = e.top_reasons || [];
+    const maxAbs = Math.max(1,
+        ...topReasons.map((r) => Math.abs(r.impact_points)));
+    const reasons = topReasons.map((r) => {
+        const cls = r.type === 'negative' ? 'neg' : 'pos';
+        const w = Math.max(6, Math.round(
+            Math.abs(r.impact_points) / maxAbs * 100));
+        return `<li class="${cls}">` +
+            `<span class="impact">${r.impact_points >= 0 ? '+' : ''}${r.impact_points}</span>` +
+            `<span class="label">${r.feature}` +
+            `<span class="bar"><i style="--w:${w}%"></i></span></span></li>`;
+    }).join('');
     const h = e.highlights || {};
     const chips = [
+        chipHtml('Income', money(h.monthly_avg_income) + '/mo'),
         chipHtml('Floor', pctOf(h.income_floor_ratio) + ' of typical'),
         chipHtml('Trend', sgnPct2(h.income_trend_slope) + '/wk'),
         chipHtml('Gaps', fmtFeature('earning_gap_irregularity', h.earning_gap_irregularity, 'days')),
@@ -364,7 +519,8 @@ function lbCardHtml(e) {
         has(h.avg_platform_rating)
             ? chipHtml('Rating', fmtFeature('avg_platform_rating', h.avg_platform_rating, 'rating')) : '',
     ].join('');
-    return `<div class="lb-card" data-user="${e.user_id}" role="button" tabindex="0"
+    return `<div class="lb-card stagger-item" data-user="${e.user_id}" role="button" tabindex="0"
+                 style="--i:${staggerIndex}"
                  title="Open ${e.user_id} in My TrustScore">
         <div class="lb-card-top">
             <span class="lb-user">${e.user_id}</span>
@@ -478,7 +634,8 @@ async function runSimulate() {
 }
 
 function renderSim(data) {
-    setScore(document.getElementById('sim-score'), data.predicted_trust_score);
+    const simNum = document.getElementById('sim-score');
+    animateScoreTo(simNum, data.predicted_trust_score);   // shared count-up + arc
     document.getElementById('sim-summary').textContent = data.summary || '';
     renderReasons(document.getElementById('sim-reasons'), data.reasons);
     renderCounterfactuals(document.getElementById('sim-cf'), data.counterfactuals);
@@ -543,22 +700,44 @@ function renderCompare(d) {
     document.getElementById('cmpCardA').innerHTML = cmpCardHtml('Worker A', A, 'a');
     document.getElementById('cmpCardB').innerHTML = cmpCardHtml('Worker B', B, 'b');
 
-    document.getElementById('cmpDiff').innerHTML = (d.diff_reasons || []).map((x) => `
+    // Shared score reveal on both cards (count-up from 300 + arc fill).
+    [['cmpCardA', A], ['cmpCardB', B]].forEach(([id, u]) => {
+        const num = document.querySelector('#' + id + ' .gauge-num');
+        if (!num) return;
+        num.textContent = '300';                        // reveal starts here
+        animateScoreTo(num, u.predicted_trust_score);
+    });
+
+    // Attribution delta bars grow from 0 like the SHAP reason lists.
+    const diffs = d.diff_reasons || [];
+    const maxDelta = Math.max(1, ...diffs.map((x) => Math.abs(x.delta)));
+    document.getElementById('cmpDiff').innerHTML = diffs.map((x) => {
+        const w = Math.max(4, Math.round(Math.abs(x.delta) / maxDelta * 100));
+        return `
         <li class="${x.delta >= 0 ? 'pos' : 'neg'}">
             <span class="impact">${sign(x.delta)}</span>
             <span class="label">${x.feature}
                 <small class="sub">A ${sign(x.impact_a)} · B ${sign(x.impact_b)} pts</small>
+                <span class="bar"><i style="--w:${w}%"></i></span>
             </span>
-        </li>`).join('');
+        </li>`;
+    }).join('');
 
     ensureCompareRadar(A.radar_values, B.radar_values, A.user_id, B.user_id);
-    renderCmpTable(A, B, d.diff_reasons || []);
+    renderCmpTable(A, B, diffs);
 }
 
 function cmpCardHtml(side, u, which) {
+    const s = u.predicted_trust_score;
     return `<div class="cmp-card-head">
             <span class="cmp-side side-${which}">${side} · <b>${u.user_id}</b></span>
-            <span class="score-band ${bandOf(u.predicted_trust_score)}">${u.predicted_trust_score}</span>
+        </div>
+        <div class="gauge-wrap">
+            <svg class="gauge" viewBox="0 0 120 120" aria-hidden="true">
+                <circle class="gauge-track" cx="60" cy="60" r="52"></circle>
+                <circle class="gauge-fill" cx="60" cy="60" r="52"></circle>
+            </svg>
+            <div class="gauge-num ${bandOf(s)}">${s}</div>
         </div>
         <p class="cmp-cohort">${cohortStr(u.cohort)}</p>
         <p class="summary-line">${u.summary || ''}</p>`;
@@ -737,6 +916,19 @@ function renderFairness(f) {
     txt('exDecGap', has(decGap) ? `${decGap >= 0 ? '+' : ''}${decGap} points` : 'does not fall');
     txt('exTol', tol);
 
+    // Inline caption states the actual gate numbers (healthy_decile_gap /
+    // gap_vs_low_volatility) so the chart's takeaway needs no guessing.
+    const cap = document.getElementById('decileCaption');
+    if (cap) {
+        cap.innerHTML = has(decGap)
+            ? `Takeaway: <b class="${decGap >= -tol ? 'hl-green' : 'hl-red'}">${sign(decGap)} pts</b> ` +
+              `healthy D10−D1 (same number the training gate enforced), and healthy swingy vs ` +
+              `low-swing workers differ <b class="${gapOk ? 'hl-green' : 'hl-red'}">${sign(gap)} pts</b> ` +
+              `— both within the ±${tol}-pt tolerance. Variability itself is not penalised.`
+            : `Takeaway: the otherwise-healthy line does not fall as swings grow ` +
+              `(tolerance ±${tol} pts).`;
+    }
+
     // ---- decile chart: overall bars + healthy line ----
     decileChart = new Chart(document.getElementById('decileChart'), {
         type: 'bar',
@@ -754,12 +946,13 @@ function renderFairness(f) {
                     data: ds.map((x) => x.avg_score_healthy),
                     type: 'line', borderColor: '#4ade80', backgroundColor: '#4ade80',
                     borderWidth: 2.5, tension: 0.3, pointRadius: 4, order: 1,
-                    spanGaps: true,
+                    borderDash: [6, 4], spanGaps: true,   // visually distinct
                 },
             ],
         },
         options: {
             responsive: true, aspectRatio: 1.5,
+            animation: { duration: PREFERS_REDUCED ? 0 : 750, easing: 'easeOutQuart' },
             scales: {
                 y: {
                     min: 400, max: 750,
@@ -768,7 +961,12 @@ function renderFairness(f) {
                 },
                 x: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
             },
-            plugins: { legend: { labels: { color: '#e2e8f0' } } },
+            plugins: {
+                legend: {
+                    labels: { color: '#e2e8f0', usePointStyle: true },
+                },
+                tooltip: CHART_TOOLTIP,
+            },
         },
     });
 
@@ -787,6 +985,7 @@ function renderFairness(f) {
         },
         options: {
             responsive: true, aspectRatio: 1.6,
+            animation: { duration: PREFERS_REDUCED ? 0 : 750, easing: 'easeOutQuart' },
             scales: {
                 y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
                 x: {
@@ -794,7 +993,7 @@ function renderFairness(f) {
                     ticks: { color: '#94a3b8', maxRotation: 60, minRotation: 60, font: { size: 10 } },
                 },
             },
-            plugins: { legend: { display: false } },
+            plugins: { legend: { display: false }, tooltip: CHART_TOOLTIP },
         },
     });
 
@@ -819,11 +1018,12 @@ function renderFairness(f) {
         },
         options: {
             indexAxis: 'y', responsive: true, aspectRatio: 0.85,
+            animation: { duration: PREFERS_REDUCED ? 0 : 700, easing: 'easeOutQuart' },
             scales: {
                 x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
                 y: { grid: { color: '#1e293b' }, ticks: { color: '#e2e8f0', font: { size: 11 } } },
             },
-            plugins: { legend: { display: false } },
+            plugins: { legend: { display: false }, tooltip: CHART_TOOLTIP },
         },
     });
     txt('impN', (ps.count || 0).toLocaleString('en-IN'));
@@ -934,13 +1134,29 @@ function renderSourceGrid() {
 
     grid.querySelectorAll('input[data-source-toggle]').forEach((inp) => {
         inp.addEventListener('change', () => {
-            consent[inp.dataset.sourceToggle] = inp.checked;
+            const src = inp.dataset.sourceToggle;
+            consent[src] = inp.checked;
             saveConsent(consent);
             const card = inp.closest('.source-card');
             if (card) card.classList.toggle('off', !inp.checked);
-            renderFeatureChips();
+            // Flash the features that just got restored/withheld in the payload.
+            renderFeatureChips().then(() => flashChips(src, inp.checked));
             scheduleConsentPreview();
         });
+    });
+}
+
+/* Brief cyan flash on restored chips / red flash on withheld ones, so the
+   toggle → payload effect is visible where it actually lands. */
+function flashChips(source, granted) {
+    const cls = granted ? 'flash-on' : 'flash-off';
+    document.querySelectorAll(
+        `#featureChips .feature-chip[data-source="${source}"]`
+    ).forEach((chip) => {
+        chip.classList.remove('flash-on', 'flash-off');
+        void chip.offsetWidth;                     // restart the animation
+        chip.classList.add(cls);
+        setTimeout(() => chip.classList.remove(cls), 1800);
     });
 }
 
@@ -959,7 +1175,8 @@ async function renderFeatureChips() {
         const title = src
             ? `Source: ${src} — ${off ? 'withheld (nulled before the model runs)' : 'granted'}`
             : 'Derived from your earnings history — always used';
-        return `<span class="feature-chip ${off ? 'off' : ''}" title="${title}">` +
+        return `<span class="feature-chip ${off ? 'off' : ''}"` +
+            ` data-source="${src || ''}" title="${title}">` +
             `${label}${off ? ' — withheld' : ''}</span>`;
     }).join('');
 }
@@ -1087,3 +1304,187 @@ document.addEventListener('click', (e) => {
 
 // Boot: resolve the initial hash (deep links like #/fairness work).
 navigate();
+
+/* ============================== guided tour =============================
+ * First-load, localStorage-gated (karmcred.tour.v1), dismissible, 5 steps:
+ * sidebar nav → search → Compare demo button → Fairness headline stats →
+ * Data & Consent toggles. Never shows twice unless replayed from the
+ * sidebar link. Positions itself over the live DOM and re-positions on
+ * scroll/resize/route changes. */
+const TOUR_KEY = 'karmcred.tour.v1';
+const TOUR_STEPS = [
+    {
+        hash: '#/score',
+        target: '.sidebar',
+        fallback: '#hamburger',
+        title: 'Six views, one app',
+        text: 'The sidebar (hamburger on phones) switches between My TrustScore, ' +
+            'the Gigs Leaderboard, Score Simulator, Compare, Fairness & the ' +
+            'Data & Consent centre — no full page reloads, back/forward works.',
+    },
+    {
+        hash: '#/score',
+        target: '.search-row',
+        fallback: '#page-score',
+        title: 'Look up any worker',
+        text: 'Enter a User ID — try GIG_0001, or the seeded twins ' +
+            'TWIN_HEALTHY / TWIN_RISKY — for the score, SHAP reason cards, ' +
+            'counterfactuals and profile radar. "Download PDF" prints a ' +
+            'clean one-page report.',
+    },
+    {
+        hash: '#/compare',
+        target: '#cmpPreset',
+        fallback: '#cmpRun',
+        title: 'One-click proof: the twins',
+        text: '"Load Demo: Healthy vs Risky Twins" fills and runs the ' +
+            'comparison instantly: identical income, identical raw volatility, ' +
+            'opposite risk patterns — the gap is the product\'s whole argument.',
+    },
+    {
+        hash: '#/fairness',
+        target: '#fairStats',
+        fallback: '#page-fairness',
+        title: 'The fairness claim, in two numbers',
+        text: 'The headline stats quantify the twist: swingiest vs smoothest ' +
+            'deciles, healthy high-swing vs low-swing gaps, all against the ' +
+            '±30-point tolerance enforced at training time.',
+    },
+    {
+        hash: '#/consent',
+        target: '#sourceGrid',
+        fallback: '#page-consent',
+        title: 'Consent is enforced, not decorated',
+        text: 'Toggle any source off: its features are nulled server-side ' +
+            'before the model runs. The preview re-scores live and the ' +
+            'affected feature chips flash so you can see exactly what changed.',
+    },
+];
+
+let tourStep = -1;
+
+function tourDom() {
+    let blocker = document.getElementById('tourBlocker');
+    if (blocker) return blocker;
+    blocker = document.createElement('div');
+    blocker.id = 'tourBlocker';
+    blocker.className = 'tour-blocker';
+    const spot = document.createElement('div');
+    spot.id = 'tourSpot';
+    spot.className = 'tour-spot';
+    const card = document.createElement('div');
+    card.id = 'tourCard';
+    card.className = 'tour-card';
+    document.body.appendChild(blocker);
+    document.body.appendChild(spot);
+    document.body.appendChild(card);
+    blocker.addEventListener('click', () => {});   // swallow clicks underneath
+    return blocker;
+}
+
+function positionTour() {
+    if (tourStep < 0) return;
+    const step = TOUR_STEPS[tourStep];
+    let el = document.querySelector(step.target);
+    if (!el) el = step.fallback ? document.querySelector(step.fallback) : null;
+    if (!el) return;
+    let r = el.getBoundingClientRect();
+    if ((r.width === 0 || r.height === 0) && step.fallback) {
+        const fb = document.querySelector(step.fallback);
+        if (fb) r = fb.getBoundingClientRect();
+    }
+    if (r.width === 0 || r.height === 0) return;
+
+    const pad = 6;
+    const spot = document.getElementById('tourSpot');
+    const card = document.getElementById('tourCard');
+    if (!spot || !card) return;
+
+    spot.style.left = (r.left - pad) + 'px';
+    spot.style.top = (r.top - pad) + 'px';
+    spot.style.width = (r.width + pad * 2) + 'px';
+    spot.style.height = (r.height + pad * 2) + 'px';
+
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const cw = Math.min(340, vw - 24);
+    card.style.width = cw + 'px';
+    const ch = card.offsetHeight || 180;
+    // prefer below the target, flip above when there is no room
+    let top = r.bottom + pad + 14;
+    if (top + ch > vh - 8) top = Math.max(8, r.top - pad - 14 - ch);
+    let left = Math.min(Math.max(8, r.left), vw - cw - 8);
+    card.style.top = top + 'px';
+    card.style.left = left + 'px';
+}
+
+function renderTourCard() {
+    const card = document.getElementById('tourCard');
+    const step = TOUR_STEPS[tourStep];
+    const n = tourStep + 1;
+    card.innerHTML = `
+        <div class="tour-step">Step ${n} of ${TOUR_STEPS.length}</div>
+        <div class="tour-title">${step.title}</div>
+        <div class="tour-text">${step.text}</div>
+        <div class="tour-actions">
+            ${tourStep > 0 ? '<button class="btn ghost small" id="tourBack">Back</button>' : ''}
+            <button class="btn ghost small" id="tourSkip">Skip</button>
+            <button class="btn small" id="tourNext">${
+                tourStep === TOUR_STEPS.length - 1 ? 'Done' : 'Next'}</button>
+        </div>`;
+    document.getElementById('tourNext').addEventListener('click', () => {
+        if (tourStep < TOUR_STEPS.length - 1) {
+            showTourStep(tourStep + 1);
+        } else {
+            finishTour();
+        }
+    });
+    const back = document.getElementById('tourBack');
+    if (back) back.addEventListener('click', () => showTourStep(tourStep - 1));
+    document.getElementById('tourSkip').addEventListener('click', finishTour);
+}
+
+function showTourStep(i) {
+    tourStep = i;
+    tourDom();
+    const step = TOUR_STEPS[i];
+    const hashChanging = location.hash !== step.hash;
+    if (hashChanging) location.hash = step.hash;   // router swaps pages
+    renderTourCard();
+    positionTour();
+    if (hashChanging) {
+        // re-position after the cross-fade settles and panels render
+        setTimeout(positionTour, 300);
+    }
+}
+
+function startTour() {
+    tourStep = 0;
+    showTourStep(0);
+}
+
+function finishTour() {
+    tourStep = -1;
+    ['tourBlocker', 'tourSpot', 'tourCard'].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.remove();
+    });
+    try { localStorage.setItem(TOUR_KEY, '1'); } catch (e) { /* ignore */ }
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && tourStep >= 0) finishTour();
+});
+window.addEventListener('resize', positionTour);
+window.addEventListener('scroll', positionTour, true);
+
+const replayBtn = document.getElementById('replayTour');
+if (replayBtn) replayBtn.addEventListener('click', startTour);
+
+// Auto-show exactly once per browser profile.
+try {
+    if (!localStorage.getItem(TOUR_KEY)) {
+        localStorage.setItem(TOUR_KEY, '1');   // gate first, tour second
+        setTimeout(() => { if (tourStep < 0) startTour(); }, 900);
+    }
+} catch (e) { /* private mode: never auto-show */ }

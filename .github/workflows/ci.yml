@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  ml-pipeline:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt pytest
+
+      # --- full ML pipeline, in order ---------------------------------
+      # Rebuild the synthetic dataset from scratch so no committed
+      # artifact can rot out from under the tests.
+      - name: Generate data
+        run: python ml/generate_data.py
+
+      - name: Train model (+ training-time fairness gate)
+        run: python ml/train_model.py
+
+      # The twin fixture is the proof of the problem statement's twist:
+      # identical income + identical raw volatility, opposite risk patterns.
+      - name: Validate twins
+        run: python ml/validate_twins.py
+
+      - name: Fairness check
+        run: python ml/fairness_check.py
+
+      # Endpoint tests: happy paths for all 6 API endpoints + 404 + 422.
+      - name: Pytest (API suite)
+        run: python -m pytest tests -q

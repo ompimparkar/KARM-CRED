@@ -3,17 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cardContainer" android:layout_width="match_parent"
     android:layout_height="wrap_content" android:layout_marginBottom="12dp"
-    app:cardCornerRadius="8dp" app:cardElevation="2dp">
+    app:cardBackgroundColor="@color/bg_panel"
+    app:cardCornerRadius="10dp" app:cardElevation="3dp">
 
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
         android:orientation="horizontal" android:padding="16dp" android:gravity="center_vertical">
 
         <TextView android:id="@+id/tvReasonText" android:layout_width="0dp"
             android:layout_height="wrap_content" android:layout_weight="1"
-            android:text="Consistent UPI Transactions" android:textSize="15sp" android:textStyle="bold" />
+            android:text="Consistent UPI Transactions" android:textColor="@color/text_primary"
+            android:textSize="15sp" android:textStyle="bold" />
 
         <TextView android:id="@+id/tvImpactScore" android:layout_width="wrap_content"
             android:layout_height="wrap_content" android:text="+45 pts"
+            android:textColor="@color/accent"
             android:textSize="16sp" android:textStyle="bold" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

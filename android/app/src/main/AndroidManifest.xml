@@ -9,22 +9,41 @@
         android:label="@string/app_name"
         android:roundIcon="@drawable/ic_launcher"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+        android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
 
-        <!-- Launcher = dashboard; consent screen is reachable from here and
-             is shown automatically on first launch (MainActivity). -->
+        <!-- Launcher = TrustScore dashboard (root of the 6-section stack);
+             consent gate shows automatically on first launch. -->
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
+        <!-- First-launch purpose-bound consent gate (shown before scoring). -->
         <activity
             android:name=".OnboardingActivity"
+            android:exported="false" />
+
+        <!-- The six web sections, mirrored behind the bottom navigation. -->
+        <activity
+            android:name=".LeaderboardActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SimulatorActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CompareActivity"
+            android:exported="false" />
+        <activity
+            android:name=".FairnessActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ConsentActivity"
             android:exported="false" />
     </application>
 

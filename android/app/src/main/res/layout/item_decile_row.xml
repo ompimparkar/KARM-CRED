@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One decile row: label, zoomed bar (400-750), all-workers avg, healthy avg. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp">
+
+    <TextView
+        android:id="@+id/tvDecLabel"
+        android:layout_width="34dp"
+        android:layout_height="wrap_content"
+        android:text="D1"
+        android:textColor="@color/text_secondary"
+        android:textSize="12sp" />
+
+    <ProgressBar
+        android:id="@+id/pbDec"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="8dp"
+        android:layout_weight="1"
+        android:indeterminate="false"
+        android:max="100"
+        android:progress="50"
+        android:progressBackgroundTint="@color/bg_panel"
+        android:progressTint="@color/bar_overall" />
+
+    <TextView
+        android:id="@+id/tvDecValue"
+        android:layout_width="46dp"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:text="611"
+        android:textColor="@color/text_primary"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/tvDecHealthy"
+        android:layout_width="52dp"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:text="635"
+        android:textColor="@color/bar_healthy"
+        android:textSize="12sp" />
+</LinearLayout>
