@@ -1,220 +1,245 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Fairness & Population: headline stats, decile bar list, SHAP importance. -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Fairness & Population: headline stats (id=fairStats), decile bar list,
+     SHAP importance — with FAIR skeleton while analyzing + particle bg. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/bg_dark">
 
-    <ScrollView
+    <com.example.karmcredapp.NetworkBgView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:fillViewport="true">
+        android:layout_height="match_parent" />
 
-        <LinearLayout
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingTop="14dp"
-            android:paddingBottom="12dp">
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true">
 
-            <TextView
-                android:id="@+id/tvFairState"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Running fairness analysis…"
-                android:textColor="@color/text_secondary"
-                android:textSize="13sp" />
-
-            <TextView
-                android:id="@+id/tvFairCaption"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/bg_panel"
-                android:padding="10dp"
-                android:text=""
-                android:textColor="@color/accent_dim"
-                android:textSize="13sp"
-                android:lineSpacingExtra="3dp" />
-
-            <!-- headline stats -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
                 android:orientation="vertical"
-                android:background="@drawable/bg_panel"
-                android:padding="6dp">
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="14dp"
+                android:paddingBottom="12dp">
+
+                <!-- pulsing skeleton while the SHAP cache is built -->
+                <com.example.karmcredapp.SkeletonView
+                    android:id="@+id/fairSkeleton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
                 <LinearLayout
+                    android:id="@+id/fairContent"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="8dp">
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
                     <TextView
-                        android:layout_width="0dp"
+                        android:id="@+id/tvFairState"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Healthy · top-quartile RAW swings"
+                        android:text="Running fairness analysis…"
                         android:textColor="@color/text_secondary"
                         android:textSize="13sp" />
 
                     <TextView
-                        android:id="@+id/tvFairHi"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/tvFairCaption"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="—"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/bg_panel"
+                        android:padding="10dp"
+                        android:text=""
+                        android:textColor="@color/accent_dim"
+                        android:textSize="13sp"
+                        android:lineSpacingExtra="3dp" />
+
+                    <!-- headline stats — tour step 4 spotlight target -->
+                    <LinearLayout
+                        android:id="@+id/fairStats"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="vertical"
+                        android:background="@drawable/bg_panel"
+                        android:padding="6dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:padding="8dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Healthy · top-quartile RAW swings"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="13sp" />
+
+                            <TextView
+                                android:id="@+id/tvFairHi"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="—"
+                                android:textColor="@color/text_primary"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:padding="8dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Bottom-quartile RAW swings (all)"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="13sp" />
+
+                            <TextView
+                                android:id="@+id/tvFairLo"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="—"
+                                android:textColor="@color/text_primary"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:padding="8dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Gap (healthy swingy − smooth)"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="13sp" />
+
+                            <TextView
+                                android:id="@+id/tvFairGap"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="—"
+                                android:textColor="@color/band_good"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:padding="8dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Healthy D10 − D1 (same as gate)"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="13sp" />
+
+                            <TextView
+                                android:id="@+id/tvFairDec"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="—"
+                                android:textColor="@color/band_good"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- decile bars -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:text="Avg score by swings-vs-peers decile"
                         android:textColor="@color/text_primary"
-                        android:textSize="16sp"
+                        android:textSize="15sp"
                         android:textStyle="bold" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="8dp">
 
                     <TextView
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Bottom-quartile RAW swings (all)"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="13sp" />
+                        android:text="Red bar = all workers (axis zoomed 400–750) · green = otherwise-healthy only"
+                        android:textColor="@color/text_muted"
+                        android:textSize="11sp" />
 
-                    <TextView
-                        android:id="@+id/tvFairLo"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:id="@+id/decileContainer"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="—"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_panel"
+                        android:orientation="vertical"
+                        android:padding="10dp" />
+
+                    <!-- SHAP importance -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:text="What the model actually uses (global SHAP)"
                         android:textColor="@color/text_primary"
-                        android:textSize="16sp"
+                        android:textSize="15sp"
                         android:textStyle="bold" />
-                </LinearLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="8dp">
-
-                    <TextView
-                        android:layout_width="0dp"
+                    <LinearLayout
+                        android:id="@+id/llImportance"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Gap (healthy swingy − smooth)"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_panel"
+                        android:orientation="vertical"
+                        android:padding="10dp" />
+
+                    <!-- population + verdict -->
+                    <TextView
+                        android:id="@+id/tvFairPop"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:text=""
                         android:textColor="@color/text_secondary"
                         android:textSize="13sp" />
 
                     <TextView
-                        android:id="@+id/tvFairGap"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/tvFairVerdict"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="—"
-                        android:textColor="@color/band_good"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="8dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Healthy D10 − D1 (same as gate)"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="13sp" />
-
-                    <TextView
-                        android:id="@+id/tvFairDec"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="—"
-                        android:textColor="@color/band_good"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/bg_panel"
+                        android:padding="12dp"
+                        android:text=""
+                        android:textColor="@color/text_primary"
+                        android:textSize="14sp"
+                        android:lineSpacingExtra="4dp" />
                 </LinearLayout>
             </LinearLayout>
+        </ScrollView>
 
-            <!-- decile bars -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="Avg score by swings-vs-peers decile"
-                android:textColor="@color/text_primary"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Red bar = all workers (axis zoomed 400–750) · green = otherwise-healthy only"
-                android:textColor="@color/text_muted"
-                android:textSize="11sp" />
-
-            <LinearLayout
-                android:id="@+id/decileContainer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:background="@drawable/bg_panel"
-                android:orientation="vertical"
-                android:padding="10dp" />
-
-            <!-- SHAP importance -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="What the model actually uses (global SHAP)"
-                android:textColor="@color/text_primary"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
-            <LinearLayout
-                android:id="@+id/llImportance"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:background="@drawable/bg_panel"
-                android:orientation="vertical"
-                android:padding="10dp" />
-
-            <!-- population + verdict -->
-            <TextView
-                android:id="@+id/tvFairPop"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text=""
-                android:textColor="@color/text_secondary"
-                android:textSize="13sp" />
-
-            <TextView
-                android:id="@+id/tvFairVerdict"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/bg_panel"
-                android:padding="12dp"
-                android:text=""
-                android:textColor="@color/text_primary"
-                android:textSize="14sp"
-                android:lineSpacingExtra="4dp" />
-        </LinearLayout>
-    </ScrollView>
-
-    <include layout="@layout/view_bottom_nav" />
-</LinearLayout>
+        <include layout="@layout/view_bottom_nav" />
+    </LinearLayout>
+</FrameLayout>

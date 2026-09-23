@@ -1,6 +1,8 @@
 package com.example.karmcredapp
 
+import android.animation.ObjectAnimator
 import android.os.Bundle
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -11,10 +13,10 @@ import retrofit2.Callback
 import retrofit2.Response
 
 /**
- * Fairness & Population — mirrors web #/fairness: headline stat blocks,
- * per-decile bar rows (all workers vs otherwise-healthy, axis zoomed
- * 400–750 like the web chart), top global SHAP importances, population
- * stats and the PASS/FAIL verdict against the ±30pt gate.
+ * Fairness & Population — mirrors web #/fairness with the motion layer:
+ * FAIR skeleton while the SHAP cache builds, headline stats block
+ * (id=fairStats — tour step 4), decile bars growing from 0 on every render
+ * (web chart draw-in twin), PASS/FAIL verdict against the ±30pt gate.
  */
 class FairnessActivity : AppCompatActivity() {
 
@@ -28,6 +30,8 @@ class FairnessActivity : AppCompatActivity() {
     private lateinit var tvDec: TextView
     private lateinit var tvPop: TextView
     private lateinit var tvVerdict: TextView
+    private lateinit var fairSkeleton: SkeletonView
+    private lateinit var fairContent: LinearLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,11 +50,31 @@ class FairnessActivity : AppCompatActivity() {
         tvDec = findViewById(R.id.tvFairDec)
         tvPop = findViewById(R.id.tvFairPop)
         tvVerdict = findViewById(R.id.tvFairVerdict)
+        fairSkeleton = findViewById(R.id.fairSkeleton)
+        fairContent = findViewById(R.id.fairContent)
+
+        fairSkeleton.setPattern(SkeletonView.Pattern.FAIR)
 
         load()
     }
 
+    override fun onResume() {
+        super.onResume()
+        TourManager.attach(this)
+    }
+
+    override fun onPause() {
+        TourManager.detach(this)
+        super.onPause()
+    }
+
+    private fun setSkeleton(loading: Boolean) {
+        fairSkeleton.visibility = if (loading) View.VISIBLE else View.GONE
+        fairContent.visibility = if (loading) View.GONE else View.VISIBLE
+    }
+
     private fun load() {
+        setSkeleton(true)
         tvState.text = "Running fairness analysis (first hit builds the SHAP cache)…"
         RetrofitClient.apiService.getFairness()
             .enqueue(object : Callback<FairnessResponse> {
@@ -60,13 +84,16 @@ class FairnessActivity : AppCompatActivity() {
                 ) {
                     val f = response.body()
                     if (response.isSuccessful && f != null) {
+                        setSkeleton(false)
                         render(f)
                     } else {
+                        setSkeleton(false)
                         tvState.text = "Fairness analysis failed (${response.code()})"
                     }
                 }
 
                 override fun onFailure(call: Call<FairnessResponse>, t: Throwable) {
+                    setSkeleton(false)
                     tvState.text = "Backend unreachable: ${t.message}"
                 }
             })
@@ -124,12 +151,26 @@ class FairnessActivity : AppCompatActivity() {
             row.findViewById<TextView>(R.id.tvDecLabel).text = "D${d.decile}"
             // Same 400–750 zoom as the web chart so differences are visible.
             val pct = ((d.avgScore - 400f) / 350f * 100f).toInt().coerceIn(0, 100)
-            row.findViewById<ProgressBar>(R.id.pbDec).progress = pct
+            val pb = row.findViewById<ProgressBar>(R.id.pbDec)
             row.findViewById<TextView>(R.id.tvDecValue).text =
                 Math.round(d.avgScore).toString()
             row.findViewById<TextView>(R.id.tvDecHealthy).text =
                 d.avgScoreHealthy?.let { Math.round(it).toString() } ?: "–"
             decileContainer.addView(row)
+
+            // bars grow from 0 (web chart draw-in twin); reduced motion snaps
+            pb.progress = 0
+            if (Motion.animatorsEnabled(pb)) {
+                pb.post {
+                    ObjectAnimator.ofInt(pb, "progress", pct).apply {
+                        duration = 550
+                        interpolator = android.view.animation.DecelerateInterpolator(2f)
+                        start()
+                    }
+                }
+            } else {
+                pb.progress = pct
+            }
         }
     }
 

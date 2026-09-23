@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- One leaderboard card: user id, band-coloured score, top SHAP reasons,
-     raw stat chips - same info as the web .lb-card. -->
+<!-- One leaderboard card: user id, band-coloured score, top SHAP reasons
+     WITH animated bars, raw stat chips - same info as the web .lb-card. -->
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -50,15 +50,25 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
+        <!-- Top reasons, each as label + impact + growing bar
+             (inflated by LeaderboardAdapter; tvLbReasonsPlain = fallback). -->
+        <LinearLayout
+            android:id="@+id/reasonContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical" />
+
         <TextView
-            android:id="@+id/tvLbReasons"
+            android:id="@+id/tvLbReasonsPlain"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="+12.0 Income floor ratio"
             android:textColor="@color/text_secondary"
             android:textSize="13sp"
-            android:lineSpacingExtra="3dp" />
+            android:lineSpacingExtra="3dp"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/tvLbChips"

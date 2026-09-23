@@ -3,6 +3,7 @@ package com.example.karmcredapp
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.SeekBar
@@ -18,8 +19,9 @@ import retrofit2.Response
 /**
  * Score Simulator — mirrors web #/simulator: the 12 feature sliders are
  * built at runtime from GET /api/feature_defaults (medians = starting
- * position), debounced POST /api/simulate updates score + SHAP reasons +
- * counterfactuals live. Hypothetical worker: no User ID involved.
+ * position), debounced POST /api/simulate updates the gauge + SHAP reasons +
+ * counterfactuals live. Motion layer: TALL2 skeleton on load, gauge
+ * count-up + band crossfade, bars with normalised growth, stagger.
  */
 class SimulatorActivity : AppCompatActivity() {
 
@@ -38,6 +40,11 @@ class SimulatorActivity : AppCompatActivity() {
     private lateinit var tvSummary: TextView
     private lateinit var rvReasons: RecyclerView
     private lateinit var rvCf: RecyclerView
+    private lateinit var simGauge: ScoreGaugeView
+    private lateinit var simSkeleton: SkeletonView
+    private lateinit var simContent: LinearLayout
+
+    private var firstRender = true
 
     private val handler = Handler(Looper.getMainLooper())
     private val simulateRunnable = Runnable { runSimulate() }
@@ -55,15 +62,32 @@ class SimulatorActivity : AppCompatActivity() {
         tvSummary = findViewById(R.id.tvSimSummary)
         rvReasons = findViewById(R.id.rvSimReasons)
         rvCf = findViewById(R.id.rvSimCf)
+        simGauge = findViewById(R.id.simGauge)
+        simSkeleton = findViewById(R.id.simSkeleton)
+        simContent = findViewById(R.id.simContent)
+
+        simSkeleton.setPattern(SkeletonView.Pattern.TALL2)
 
         rvReasons.layoutManager = LinearLayoutManager(this)
         rvReasons.adapter = ReasonCardAdapter(emptyList())
         rvCf.layoutManager = LinearLayoutManager(this)
         rvCf.adapter = ReasonCardAdapter(emptyList())
 
-        findViewById<Button>(R.id.btnSimReset).setOnClickListener { resetToTypical() }
+        val btnReset = findViewById<Button>(R.id.btnSimReset)
+        btnReset.setOnClickListener { resetToTypical() }
+        Motion.attachPressScale(btnReset)
 
         loadDefaults()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        TourManager.attach(this)
+    }
+
+    override fun onPause() {
+        TourManager.detach(this)
+        super.onPause()
     }
 
     override fun onDestroy() {
@@ -73,8 +97,7 @@ class SimulatorActivity : AppCompatActivity() {
 
     // ---------------------------------------------------------- sliders ---
     private fun loadDefaults() {
-        tvState.text = "Loading sliders…"
-        tvState.visibility = TextView.VISIBLE
+        setSkeleton(true)
         RetrofitClient.apiService.getFeatureDefaults()
             .enqueue(object : Callback<FeatureDefaultsResponse> {
                 override fun onResponse(
@@ -83,11 +106,14 @@ class SimulatorActivity : AppCompatActivity() {
                 ) {
                     val d = response.body()
                     if (response.isSuccessful && d != null) {
+                        setSkeleton(false)
                         tvState.visibility = TextView.GONE
                         defaultsMedians = d.medians
                         buildSliders(d)
                         resetToTypical()
                     } else {
+                        setSkeleton(false)
+                        tvState.visibility = TextView.VISIBLE
                         tvState.text = "Could not load slider defaults (${response.code()})"
                     }
                 }
@@ -95,9 +121,17 @@ class SimulatorActivity : AppCompatActivity() {
                 override fun onFailure(
                     call: Call<FeatureDefaultsResponse>, t: Throwable
                 ) {
+                    setSkeleton(false)
+                    tvState.visibility = TextView.VISIBLE
                     tvState.text = "Backend unreachable: ${t.message}"
                 }
             })
+    }
+
+    /** Skeleton ↔ content swap while the defaults load (web .sk twin). */
+    private fun setSkeleton(loading: Boolean) {
+        simSkeleton.visibility = if (loading) View.VISIBLE else View.GONE
+        simContent.visibility = if (loading) View.GONE else View.VISIBLE
     }
 
     private fun buildSliders(defaults: FeatureDefaultsResponse) {
@@ -217,26 +251,53 @@ class SimulatorActivity : AppCompatActivity() {
     }
 
     private fun render(data: SimulateResponse) {
-        tvScore.setTextColor(UiUtils.bandColor(this, data.predictedTrustScore))
-        tvScore.text = data.predictedTrustScore.toString()
+        // gauge sweep + number count-up with band crossfade
+        Motion.countUpTo(tvScore, data.predictedTrustScore, simGauge)
         tvSummary.text = data.summary.orEmpty()
 
-        val reasonCards = mutableListOf<ReasonCard>()
-        data.reasons?.forEach { r ->
-            val sign = if (r.impactPoints >= 0) "+" else ""
-            reasonCards.add(ReasonCard(r.feature, "$sign${r.impactPoints} pts"))
+        // SHAP reasons with normalised growing bars
+        val reasons = data.reasons.orEmpty()
+        val reasonFracs = Motion.barFractions(reasons.map { it.impactPoints })
+        val reasonCards = reasons.mapIndexed { i, r ->
+            ReasonCard(
+                reason = r.feature,
+                impact = "%+.1f pts".format(r.impactPoints),
+                barFraction = reasonFracs[i],
+                barTone = if (r.type == "negative")
+                    ReasonCard.TONE_NEG else ReasonCard.TONE_POS
+            )
         }
-        rvReasons.adapter = ReasonCardAdapter(reasonCards)
+        rvReasons.adapter = ReasonCardAdapter(
+            reasonCards.ifEmpty {
+                listOf(ReasonCard("No attribution available.", "—"))
+            }
+        )
 
-        val cfCards = mutableListOf<ReasonCard>()
-        data.counterfactuals?.forEach { cf ->
-            cfCards.add(ReasonCard("Try: ${cf.action}", "+${cf.deltaPoints.toInt()} pts"))
-        }
-        if (cfCards.isEmpty()) {
-            cfCards.add(
-                ReasonCard("Profile already strong — no single change adds 3+ pts.", "—")
+        // counterfactuals as cyan cards
+        val cfs = data.counterfactuals.orEmpty()
+        val cfFracs = Motion.barFractions(cfs.map { it.deltaPoints })
+        val cfCards = cfs.mapIndexed { i, cf ->
+            ReasonCard(
+                reason = "Try: ${cf.action}",
+                impact = "+${cf.deltaPoints.toInt()} pts",
+                sub = "${cf.feature} → ${UiUtils.fmtFeature(cf.target, "")}",
+                barFraction = cfFracs[i],
+                barTone = ReasonCard.TONE_CF
+            )
+        }.ifEmpty {
+            listOf(
+                ReasonCard(
+                    "Profile already strong — no single change adds 3+ pts.", "—"
+                )
             )
         }
         rvCf.adapter = ReasonCardAdapter(cfCards)
+
+        // staggered entrance on the first render only (slider ticks are live)
+        if (firstRender) {
+            firstRender = false
+            Motion.staggerRecycler(rvReasons)
+            Motion.staggerRecycler(rvCf)
+        }
     }
 }

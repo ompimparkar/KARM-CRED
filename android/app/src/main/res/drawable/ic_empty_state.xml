@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Empty/error-state illustration — Android twin of the web dashboard's
+     empty-state SVG (gauge ring + magnifier + spark line, same palette). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="140dp"
+    android:height="140dp"
+    android:viewportWidth="140"
+    android:viewportHeight="140">
+
+    <!-- gauge ring -->
+    <path
+        android:pathData="M70,70m-46,0a46,46 0,1 1,92 0a46,46 0,1 1,-92 0"
+        android:strokeColor="#334155"
+        android:strokeWidth="7"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+    <!-- value arc, ~300→600 of 300..900 (cyan) -->
+    <path
+        android:pathData="M70,24 A46,46 0 1 1 27.9,93"
+        android:strokeColor="#38bdf8"
+        android:strokeWidth="7"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+    <!-- centre dot cluster -->
+    <path
+        android:pathData="M64,70m-5,0a5,5 0,1 1,10 0a5,5 0,1 1,-10 0"
+        android:fillColor="#7dd3fc" />
+    <path
+        android:pathData="M78,58m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0"
+        android:fillColor="#4ade80" />
+    <path
+        android:pathData="M58,56m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0"
+        android:fillColor="#facc15" />
+    <!-- connecting spark line under the ring -->
+    <path
+        android:pathData="M30,118 L52,104 L70,112 L92,96 L110,104"
+        android:strokeColor="#38bdf8"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000" />
+    <!-- magnifier -->
+    <path
+        android:pathData="M96,110m-13,0a13,13 0,1 1,26 0a13,13 0,1 1,-26 0"
+        android:strokeColor="#e2e8f0"
+        android:strokeWidth="4"
+        android:fillColor="#00000000" />
+    <path
+        android:pathData="M105,119 L116,130"
+        android:strokeColor="#e2e8f0"
+        android:strokeWidth="5"
+        android:strokeLineCap="round" />
+</vector>

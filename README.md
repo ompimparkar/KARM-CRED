@@ -120,5 +120,20 @@ cd android
 
 First launch gates on the consent screen (grant each source or no scoring happens); the Consent section later lets you revoke and re-score live.
 
+### ✨ Motion & polish layer (website-parity pass)
+
+The Android app mirrors the web dashboard's production polish end to end:
+
+* **Score gauge + count-up** — hand-drawn `ScoreGaugeView` (band-coloured arc, `progress = (score−300)/600`) driven by `Motion.countUpTo()` so the number counts up (~800 ms ease-out) with a green/amber/red crossfade, on My TrustScore, the Simulator, and both Compare cards.
+* **Profile radar** — `RadarView` draws the 5-axis polygon growing from the centre (~900 ms) from the backend's `radar_values`.
+* **SHAP reason bars** — reason, counterfactual, compare-diff, and leaderboard cards grow a normalised bar from 0 (green positive / red negative / cyan counterfactual, min 4 % width, same rule as the web).
+* **Skeleton loaders** — one reusable `SkeletonView` (pulsing 0.35↔0.8 alpha, ~1.1 s) with per-screen patterns: SCORE, GRID6, CARD2, TALL2, FAIR, PREVIEW; replaces every "Loading…" text state, with error + retry (leaderboard) and empty-state art (shared `ic_empty_state`).
+* **Trust-network background** — `NetworkBgView` particles on all six screens: 28/40/56 nodes by width, lines capped at 0.15 alpha and skipped under 480 dp, ~30 fps, paused off-screen, one static frame under reduced motion.
+* **Page transitions & stagger** — shared fade/rise cross-fade (`fade_in`/`fade_out`) on every bottom-nav and deep-link navigation; RecyclerViews stagger in at i×39 ms (≈400 ms budget for a 10-card list).
+* **Micro-interactions** — 0.97 press-scale on cards and buttons, decile bars growing from 0 on Fairness, consent chip flash-on/flash-off (cyan/red, 2 × 0.85 s) on every source toggle.
+* **Share score card** — renders a dark 1080×1420 PNG (brand, id, band-coloured score, summary, ₹/metrics, footer) and opens the system share sheet via `FileProvider` — the Android twin of the web "Download PDF".
+* **First-load guided tour** — 5 steps (bottom bar → search → twins demo → fairness stats → consent toggles) with spotlight overlay, Skip/Back/Next, `karmcred.tour.v1` preference, and **Replay the guided tour** on the Consent screen.
+* Everything honours the system animator scale (`prefers-reduced-motion` equivalent): animations snap to final states when disabled.
+
 ---
 *Developed for CODEX 2026 - MUSA*

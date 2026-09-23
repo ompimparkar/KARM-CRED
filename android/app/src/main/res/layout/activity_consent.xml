@@ -1,159 +1,199 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Data & Consent: per-source toggles, live score preview, feature states. -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Data & Consent: per-source toggles (id=sourceToggles — tour step 5),
+     live score preview with PREVIEW skeleton, feature states, docs,
+     replay-tour button — with particle background. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/bg_dark">
 
-    <ScrollView
+    <com.example.karmcredapp.NetworkBgView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:fillViewport="true">
+        android:layout_height="match_parent" />
 
-        <LinearLayout
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingTop="14dp"
-            android:paddingBottom="12dp">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="DEMO SCOPE — grants are stored on this device only; not production consent infrastructure."
-                android:textColor="@color/band_mid"
-                android:textSize="12sp"
-                android:lineSpacingExtra="2dp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Every source the model can use is opt-in. Deny one and its features are nulled server-side before inference, then cohort-imputed."
-                android:textColor="@color/text_secondary"
-                android:textSize="13sp"
-                android:lineSpacingExtra="3dp" />
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
                 android:orientation="vertical"
-                android:background="@drawable/bg_panel"
-                android:padding="6dp">
-
-                <CheckBox
-                    android:id="@+id/chkUpi"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="8dp"
-                    android:text="UPI &amp; bank SMS metadata"
-                    android:textColor="@color/text_primary" />
-
-                <CheckBox
-                    android:id="@+id/chkUtility"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="8dp"
-                    android:text="Utility bill reminders"
-                    android:textColor="@color/text_primary" />
-
-                <CheckBox
-                    android:id="@+id/chkPlatform"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="8dp"
-                    android:text="Gig platform profile &amp; ratings"
-                    android:textColor="@color/text_primary" />
-            </LinearLayout>
-
-            <Button
-                android:id="@+id/btnConsentPreview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:backgroundTint="@color/accent"
-                android:text="Re-score GIG_0001 with these grants"
-                android:textAllCaps="false"
-                android:textColor="@color/bg_dark" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:orientation="vertical"
-                android:gravity="center_horizontal"
-                android:background="@drawable/bg_panel"
-                android:padding="14dp">
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="14dp"
+                android:paddingBottom="12dp">
 
                 <TextView
-                    android:id="@+id/tvConsentWho"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Preview: GIG_0001"
-                    android:textColor="@color/text_muted"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/tvConsentScore"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="—"
-                    android:textColor="@color/accent"
-                    android:textSize="36sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tvConsentSummary"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text=""
+                    android:text="DEMO SCOPE — grants are stored on this device only; not production consent infrastructure."
+                    android:textColor="@color/band_mid"
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="2dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Every source the model can use is opt-in. Deny one and its features are nulled server-side before inference, then cohort-imputed."
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp"
                     android:lineSpacingExtra="3dp" />
+
+                <!-- tour step 5 spotlight target -->
+                <LinearLayout
+                    android:id="@+id/sourceToggles"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="vertical"
+                    android:background="@drawable/bg_panel"
+                    android:padding="6dp">
+
+                    <CheckBox
+                        android:id="@+id/chkUpi"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="8dp"
+                        android:text="UPI &amp; bank SMS metadata"
+                        android:textColor="@color/text_primary" />
+
+                    <CheckBox
+                        android:id="@+id/chkUtility"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="8dp"
+                        android:text="Utility bill reminders"
+                        android:textColor="@color/text_primary" />
+
+                    <CheckBox
+                        android:id="@+id/chkPlatform"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="8dp"
+                        android:text="Gig platform profile &amp; ratings"
+                        android:textColor="@color/text_primary" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btnConsentPreview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:backgroundTint="@color/accent"
+                    android:text="Re-score GIG_0001 with these grants"
+                    android:textAllCaps="false"
+                    android:textColor="@color/bg_dark" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:background="@drawable/bg_panel"
+                    android:padding="14dp">
+
+                    <!-- skeleton over the preview card on first load -->
+                    <com.example.karmcredapp.SkeletonView
+                        android:id="@+id/consentSkeleton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone" />
+
+                    <LinearLayout
+                        android:id="@+id/previewContent"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal">
+
+                        <TextView
+                            android:id="@+id/tvConsentWho"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Preview: GIG_0001"
+                            android:textColor="@color/text_muted"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/tvConsentScore"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="—"
+                            android:textColor="@color/accent"
+                            android:textSize="36sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvConsentSummary"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text=""
+                            android:textColor="@color/text_secondary"
+                            android:textSize="13sp"
+                            android:lineSpacingExtra="3dp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="Feature states"
+                    android:textColor="@color/text_primary"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <!-- feature chips are built programmatically per grant -->
+                <LinearLayout
+                    android:id="@+id/featureBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:orientation="vertical" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="How your data is handled"
+                    android:textColor="@color/text_primary"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="• What's stored: only your consent grants (on-device prefs) and the API's in-memory synthetic profiles — no real PII.\n\n• Derived vs. sent: pattern features (income floor, trend, swings-vs-peers, payday gaps, savings ratio) are computed from your earnings history; raw SMS/UPI records never leave the device — only derived aggregates reach the API.\n\n• Enforcement: a denied source's features are set to null inside the API before the model runs (backend/app.py consent gate) — the model never receives them; it falls back to cohort-median imputation and reports lower data completeness.\n\n• Production path: Account Aggregator framework (RBI-regulated consent-based sharing), RBI digital lending guidelines 2022 (explicit consent, data minimisation, reason codes), and India's DPDP Act 2023 (purpose-bound consent, withdrawal as easy as grant, erasure on demand)."
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp"
+                    android:lineSpacingExtra="4dp" />
+
+                <!-- guided-tour replay (web #replayTour twin) -->
+                <Button
+                    android:id="@+id/btnReplayTour"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="Replay the guided tour"
+                    android:textAllCaps="false"
+                    android:textColor="@color/accent"
+                    android:textSize="13sp" />
             </LinearLayout>
+        </ScrollView>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="Feature states"
-                android:textColor="@color/text_primary"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
-            <!-- feature chips are built programmatically per grant -->
-            <LinearLayout
-                android:id="@+id/featureBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:orientation="vertical" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="How your data is handled"
-                android:textColor="@color/text_primary"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="• What's stored: only your consent grants (on-device prefs) and the API's in-memory synthetic profiles — no real PII.\n\n• Derived vs. sent: pattern features (income floor, trend, swings-vs-peers, payday gaps, savings ratio) are computed from your earnings history; raw SMS/UPI records never leave the device — only derived aggregates reach the API.\n\n• Enforcement: a denied source's features are set to null inside the API before the model runs (backend/app.py consent gate) — the model never receives them; it falls back to cohort-median imputation and reports lower data completeness.\n\n• Production path: Account Aggregator framework (RBI-regulated consent-based sharing), RBI digital lending guidelines 2022 (explicit consent, data minimisation, reason codes), and India's DPDP Act 2023 (purpose-bound consent, withdrawal as easy as grant, erasure on demand)."
-                android:textColor="@color/text_secondary"
-                android:textSize="13sp"
-                android:lineSpacingExtra="4dp" />
-        </LinearLayout>
-    </ScrollView>
-
-    <include layout="@layout/view_bottom_nav" />
-</LinearLayout>
+        <include layout="@layout/view_bottom_nav" />
+    </LinearLayout>
+</FrameLayout>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Staggered card entrance (web: .stagger-row --i × 40ms, rise 12dp + fade,
+     ~400ms budget). Driven by Motion.staggerRecycler() with delta 0.15. -->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:interpolator="@android:interpolator/decelerate_quad">
+
+    <alpha
+        android:duration="260"
+        android:fromAlpha="0.0"
+        android:toAlpha="1.0" />
+
+    <translate
+        android:duration="260"
+        android:fromYDelta="12dp"
+        android:toYDelta="0" />
+</set>

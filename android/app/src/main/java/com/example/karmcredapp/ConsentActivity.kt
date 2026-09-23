@@ -1,6 +1,8 @@
 package com.example.karmcredapp
 
+import android.graphics.Color
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.LinearLayout
@@ -13,11 +15,12 @@ import retrofit2.Callback
 import retrofit2.Response
 
 /**
- * Data & Consent — mirrors web #/consent: per-source toggles (backed by
- * ConsentManager), a live score preview re-scoring GIG_0001 with
- * ?consent=… on every change, per-feature granted/withheld states, and
- * the "how your data is handled" docs. First-run gate stays separate
- * (OnboardingActivity); this is the revocable management screen.
+ * Data & Consent — mirrors web #/consent with the motion layer:
+ * per-source toggles (id=sourceToggles — tour step 5) with the flash-on/
+ * flash-off chip animation on every change (2 × 0.85s, cyan/red), PREVIEW
+ * skeleton on first load, live score preview re-scoring GIG_0001 with
+ * ?consent=…, feature granted/withheld chips, docs, and the replay-tour
+ * button (web #replayTour twin).
  */
 class ConsentActivity : AppCompatActivity() {
 
@@ -25,6 +28,13 @@ class ConsentActivity : AppCompatActivity() {
     private lateinit var featureBox: LinearLayout
     private lateinit var tvScore: TextView
     private lateinit var tvSummary: TextView
+    private lateinit var consentSkeleton: SkeletonView
+    private lateinit var previewContent: LinearLayout
+
+    /** Source → its header chip in featureBox (flash target). */
+    private val headerChips = mutableMapOf<String, TextView>()
+
+    private var firstPreview = true
 
     /** Feature → consent source (null = always used, derived history). */
     private val featureSource = mapOf(
@@ -72,25 +82,75 @@ class ConsentActivity : AppCompatActivity() {
         featureBox = findViewById(R.id.featureBox)
         tvScore = findViewById(R.id.tvConsentScore)
         tvSummary = findViewById(R.id.tvConsentSummary)
+        consentSkeleton = findViewById(R.id.consentSkeleton)
+        previewContent = findViewById(R.id.previewContent)
+
+        consentSkeleton.setPattern(SkeletonView.Pattern.PREVIEW)
 
         checks.forEach { (source, box) ->
             box.isChecked = ConsentManager.isGranted(this, source)
             box.setOnCheckedChangeListener { _, checked ->
                 ConsentManager.setGranted(this, source, checked)
                 renderFeatureStates()   // immediate withheld/restored feedback
+                flash(source, checked)  // web flash-on/flash-off chip animation
                 loadPreview()
             }
         }
 
-        findViewById<Button>(R.id.btnConsentPreview).setOnClickListener { loadPreview() }
+        val btnPreview = findViewById<Button>(R.id.btnConsentPreview)
+        btnPreview.setOnClickListener { loadPreview() }
+        Motion.attachPressScale(btnPreview)
+
+        val btnReplay = findViewById<Button>(R.id.btnReplayTour)
+        btnReplay.setOnClickListener { TourManager.replay(this) }
+        Motion.attachPressScale(btnReplay)
 
         renderFeatureStates()
         loadPreview()
     }
 
+    override fun onResume() {
+        super.onResume()
+        TourManager.attach(this)
+    }
+
+    override fun onPause() {
+        TourManager.detach(this)
+        super.onPause()
+    }
+
+    /**
+     * Flash the source's header chip twice (web: flash-on cyan / flash-off
+     * red, 0.85s × 2, then back to the steady state). Reduced motion: skip.
+     */
+    private fun flash(source: String, granted: Boolean) {
+        val chip = headerChips[source] ?: return
+        if (!Motion.animatorsEnabled(chip)) return
+
+        val flashRes =
+            if (granted) R.drawable.bg_chip_flash_on else R.drawable.bg_chip_flash_off
+        val flashColor = getColor(if (granted) R.color.accent else R.color.band_low)
+
+        val steps = listOf(
+            0L to true, 850L to false, 1700L to true, 2550L to false
+        )
+        steps.forEach { (delay, on) ->
+            chip.postDelayed({
+                if (on) {
+                    chip.setBackgroundResource(flashRes)
+                    chip.setTextColor(flashColor)
+                } else {
+                    chip.setBackgroundColor(Color.TRANSPARENT)
+                    chip.setTextColor(getColor(R.color.accent))
+                }
+            }, delay)
+        }
+    }
+
     // ----------------------------------------------------- feature states ---
     private fun renderFeatureStates() {
         featureBox.removeAllViews()
+        headerChips.clear()
 
         addChip("Always used (derived from your earnings history):", null, true, true)
         featureSource.filterValues { it == null }.keys.forEach { f ->
@@ -124,7 +184,7 @@ class ConsentActivity : AppCompatActivity() {
             textSize = if (isHeader) 13f else 12f
             this.text = text
             if (isHeader) {
-                setBackgroundColor(android.graphics.Color.TRANSPARENT)
+                setBackgroundColor(Color.TRANSPARENT)
                 setTextColor(getColor(R.color.accent))
             } else {
                 setBackgroundResource(
@@ -135,6 +195,7 @@ class ConsentActivity : AppCompatActivity() {
                 )
             }
         }
+        if (isHeader && source != null) headerChips[source] = tv
         featureBox.addView(tv)
     }
 
@@ -143,7 +204,13 @@ class ConsentActivity : AppCompatActivity() {
         val granted = ConsentManager.hasAnyGrant(this)
         val consent = ConsentManager.consentQuery(this)
 
+        if (firstPreview) {
+            consentSkeleton.visibility = View.VISIBLE
+            previewContent.visibility = View.GONE
+        }
+
         if (!granted) {
+            finishPreview()
             tvScore.setTextColor(getColor(R.color.text_muted))
             tvScore.text = "—"
             tvSummary.text =
@@ -158,6 +225,7 @@ class ConsentActivity : AppCompatActivity() {
                     call: Call<TrustScoreResponse>,
                     response: Response<TrustScoreResponse>
                 ) {
+                    finishPreview()
                     val d = response.body()
                     if (response.isSuccessful && d != null) {
                         tvScore.setTextColor(
@@ -174,6 +242,7 @@ class ConsentActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<TrustScoreResponse>, t: Throwable) {
+                    finishPreview()
                     tvSummary.text = "Backend unreachable: ${t.message}"
                     Toast.makeText(
                         this@ConsentActivity,
@@ -182,6 +251,15 @@ class ConsentActivity : AppCompatActivity() {
                     ).show()
                 }
             })
+    }
+
+    /** Swap skeleton → preview content once (first load only). */
+    private fun finishPreview() {
+        if (firstPreview) {
+            firstPreview = false
+            consentSkeleton.visibility = View.GONE
+            previewContent.visibility = View.VISIBLE
+        }
     }
 
     companion object {

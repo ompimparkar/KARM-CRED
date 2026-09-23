@@ -40,7 +40,11 @@ object BottomNav {
                         Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                     )
                     activity.startActivity(intent)
-                    if (activity !is MainActivity) activity.finish()
+                    Motion.fadeTo(activity)               // page cross-fade in
+                    if (activity !is MainActivity) {
+                        activity.finish()
+                        Motion.fadeBack(activity)         // current screen fades out
+                    }
                     true
                 }
             }
