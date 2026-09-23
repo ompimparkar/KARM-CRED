@@ -1,4 +1,10 @@
 # KARM CRED 🚀
+## 🎥 Project Demo Video
+
+Check out the full working demo of KARM-CRED in action! 
+
+**👉 [Click here to watch the Demo Video on YouTube](https://youtu.be/esHOSGSqgPo)**
+
 **Credit Score for the Invisible** — alternative credit scoring platform for the gig economy — CODEX 2026
 
 ![CI](https://github.com/ompimparkar/KARM-CRED/actions/workflows/ci.yml/badge.svg)
