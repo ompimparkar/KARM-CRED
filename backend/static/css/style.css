@@ -66,3 +66,77 @@ input[type="range"] {
     color: #4ade80;
     margin-top: 0.5rem;
 }
+
+.summary-line {
+    margin-top: 0.75rem;
+    font-size: 0.95rem;
+    color: #bae6fd;
+    line-height: 1.4;
+    min-height: 1.2em;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+    margin: 1.2rem 0;
+}
+
+.metric {
+    background-color: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 0.55rem 0.7rem;
+}
+
+.metric-wide {
+    grid-column: 1 / -1;
+}
+
+.metric span {
+    display: block;
+    font-size: 0.75rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.metric b {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 0.95rem;
+    color: #f8fafc;
+    word-break: break-word;
+}
+
+.impact-list {
+    list-style: none;
+    margin-top: 0.75rem;
+}
+
+.impact-list li {
+    display: flex;
+    align-items: baseline;
+    gap: 0.7rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #1e293b;
+    font-size: 0.95rem;
+}
+
+.impact-list .impact {
+    min-width: 3.4rem;
+    text-align: right;
+    font-weight: bold;
+    font-variant-numeric: tabular-nums;
+}
+
+.impact-list li.pos .impact { color: #4ade80; }
+.impact-list li.neg .impact { color: #f87171; }
+.impact-list li.cf .impact { color: #38bdf8; }
+.impact-list .label { color: #e2e8f0; }
+
+.hint {
+    margin-top: 0.8rem;
+    font-size: 0.8rem;
+    color: #64748b;
+}

@@ -5,11 +5,20 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <Button
+        android:id="@+id/btnManageConsent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:text="Manage Data Sources"
+        android:textSize="12sp"
+        style="?android:attr/borderlessButtonStyle" />
+
     <EditText
         android:id="@+id/etUserId"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter User ID (e.g. GIG0001)"
+        android:hint="Enter User ID (e.g. GIG_0001, TWIN_HEALTHY)"
         android:inputType="text" />
 
     <Button
@@ -25,15 +34,28 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:gravity="center"
-        android:text="750"
+        android:text="—"
         android:textSize="32sp"
         android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvSummary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
+        android:text=""
+        android:textSize="13sp"
+        android:textColor="#555555"
+        android:lineSpacingExtra="2dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvReasonCards"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="16dp"
+        android:clipToPadding="false"
+        android:paddingBottom="16dp" />
 
 </LinearLayout>

@@ -10,10 +10,11 @@
 <body>
     <div class="dashboard-container">
         <h1>KARM CRED Alternative Scoring Dashboard</h1>
-        
+
         <!-- Search Box for User ID -->
         <div class="search-box" style="margin-bottom: 1.5rem; display: flex; gap: 10px;">
-            <input type="text" id="userIdSearch" placeholder="Enter User ID (e.g., GIG0001)" style="padding: 0.75rem; flex: 1; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white;">
+            <input type="text" id="userIdSearch" placeholder="Enter User ID (e.g. GIG_0001, or the twins TWIN_HEALTHY / TWIN_RISKY)"
+                   style="padding: 0.75rem; flex: 1; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white;">
             <button onclick="fetchUserData()" style="padding: 0.75rem 1.5rem; background: #38bdf8; color: #0f172a; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">
                 Analyze User
             </button>
@@ -23,25 +24,31 @@
             <!-- Control Panel -->
             <div class="control-panel">
                 <h2>User Financial Metrics</h2>
-                
-                <div class="slider-group">
-                    <label>Income Volatility: <span id="volatility-val">20%</span></label>
-                    <input type="range" id="volatility" min="0" max="1" step="0.01" value="0.2">
-                </div>
-
-                <div class="slider-group">
-                    <label>Monthly UPI Txns: <span id="upi-val">50</span></label>
-                    <input type="range" id="upi" min="0" max="250" step="1" value="50">
-                </div>
-
-                <div class="slider-group">
-                    <label>Utility Bill Ratio: <span id="utility-val">80%</span></label>
-                    <input type="range" id="utility" min="0" max="1" step="0.01" value="0.8">
-                </div>
 
                 <div class="score-card">
                     <h3>Predicted Trust Score</h3>
-                    <div id="score-display">750</div>
+                    <div id="score-display">—</div>
+                    <p id="summary-display" class="summary-line"></p>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="metric"><span>Income Floor</span><b id="m-floor">—</b></div>
+                    <div class="metric"><span>Swings vs. Peers</span><b id="m-cohvol">—</b></div>
+                    <div class="metric"><span>Earnings Trend</span><b id="m-trend">—</b></div>
+                    <div class="metric"><span>Payday Gap Irregularity</span><b id="m-gap">—</b></div>
+                    <div class="metric"><span>Platform Rating</span><b id="m-rating">—</b></div>
+                    <div class="metric"><span>Data Completeness</span><b id="m-completeness">—</b></div>
+                    <div class="metric metric-wide"><span>Cohort</span><b id="m-cohort">—</b></div>
+                </div>
+
+                <div class="slider-group">
+                    <label>Monthly UPI Txns: <span id="upi-val">—</span></label>
+                    <input type="range" id="upi" min="0" max="250" step="1" value="0">
+                </div>
+
+                <div class="slider-group">
+                    <label>Utility Bill Ratio: <span id="utility-val">—</span></label>
+                    <input type="range" id="utility" min="0" max="1" step="0.01" value="0">
                 </div>
             </div>
 
@@ -49,6 +56,18 @@
             <div class="chart-panel">
                 <h2>Credit Profile Comparison</h2>
                 <canvas id="creditRadarChart"></canvas>
+            </div>
+        </div>
+
+        <div class="content-grid" style="margin-top: 2rem;">
+            <div class="control-panel">
+                <h2>Why this score (SHAP reason cards)</h2>
+                <ul id="reasons-list" class="impact-list"></ul>
+            </div>
+            <div class="control-panel">
+                <h2>What would improve it (counterfactuals)</h2>
+                <ul id="cf-list" class="impact-list"></ul>
+                <p class="hint">Each suggestion is estimated one change at a time; actual gains may overlap if you make several changes together.</p>
             </div>
         </div>
     </div>
